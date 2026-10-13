@@ -90,7 +90,7 @@ export const WineBrowser = ({ eyebrow, title, description, fixed = {}, emptyTitl
         )}
       </div>
       <WineDetailDialog wine={detail} onClose={() => setDetailId(null)} onEdit={(w) => { setDetailId(null); setEditing(w); }} />
-      <WineFormDialog open={!!editing} wine={editing} onClose={() => setEditing(null)} onSaved={(w) => { setEditing(null); setDetailId(w.id); }} />
+      <WineFormDialog open={!!editing} wine={editing} onClose={() => setEditing(null)} onSaved={() => setEditing(null)} />
     </Page>
   );
 };

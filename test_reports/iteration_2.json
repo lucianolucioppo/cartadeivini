@@ -1,0 +1,26 @@
+{
+  "summary": "Executed full backend (25 pytest tests, 100% pass) + frontend Playwright tests of Carta dei Vini. All critical flows pass: login (incl. wrong-pass error, unauth 401), wine CRUD with comma-decimal prices (24,50 / 25,00), gallery+list views, search, filters/reset, favorite toggle, detail dialog (shows prezzo in carta, acquisto, ricarico), Produttori page+filter link (/vini?produttore=X), Regioni e tipologie, Preferiti, Carta per i clienti (NO 'Prezzo di acquisto' label and no purchase price values displayed; both carta switches present), Account page (create-user-button), Backup page (export-csv, export-excel, download-backup buttons), mobile nav + more sheet. Backend verified: CSV export is UTF-8 BOM + semicolon + Italian headers, XLSX is a valid zip, backup JSON has wines+photos, restore is admin-only (403 for staff), invalid file -> 400, no public registration endpoint, GET /api/files requires auth (401). All TEST_ data created was deleted at the end; DB ends with 0 wines and only the seeded admin user.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "WinesPage after create", "issues": ["After submitting the wine form, the detail dialog auto-opens on top of the list. The underlying DialogOverlay sometimes lingers and intercepts pointer events on surrounding controls (e.g. view-mode toggle) until an Escape/close is issued. Not a blocker for real users (they click the X), but it is a minor UX+automation nit — consider closing the form dialog cleanly without immediately opening the detail dialog, or ensuring the overlay unmounts synchronously on close."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_carta_vini.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py is ~500 lines and still coherent, but could be split into routers (auth, users, wines, export, backup) for maintainability.",
+    "login_attempts collection has no TTL index for cleanup; consider adding a TTL on created_at or expireAfter on locked_until to keep the collection small.",
+    "Access cookie expires in 15 min; frontend relies on silent /auth/refresh — ensure 401 interceptor handles refresh race on parallel requests.",
+    "backup/restore reads the whole payload (including base64 photos) into memory — fine for small catalogs but consider streaming / size cap for large restores."
+  ],
+  "updated_files": ["/app/backend/tests/test_carta_vini.py"],
+  "success_rate": {"backend": "100% (25/25)", "frontend": "100% of exercised flows"},
+  "test_credentials": "admin@cartadeivini.it / Bordeaux-2026! (seeded via backend/.env, confirmed working)",
+  "seed_data_creation": "None left behind. Created and then deleted: wines prefixed TEST_ (TEST_Barolo Riserva, TEST_UI_Vino, TEST_UI2_Vino, TEST_Final) and user TEST_staff@cartadeivini.it. Final DB state: 0 wines, 1 user (admin).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Backend regression tests live at /app/backend/tests/test_carta_vini.py — run with: pytest /app/backend/tests/test_carta_vini.py -v. Tests self-cleanup via TestZCleanup class. Admin seeded from backend/.env (ADMIN_EMAIL/ADMIN_PASSWORD). Note: emails are lowercased by backend, so a staff created as 'TEST_staff@...' is stored as 'test_staff@...'; cleanup must handle both prefixes. Playwright gotcha: after wine form submit the detail dialog auto-opens — press Escape before interacting with background controls."
+}
