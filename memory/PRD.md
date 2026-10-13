@@ -27,9 +27,14 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Export CSV/XLSX, backup/restore JSON
 - Testing: backend 25/25, frontend flows OK (iteration_2)
 
+## Implemented (2026-10-13, iterazione 2)
+- Import da Excel/CSV (`/app/backend/importer.py`): riconoscimento automatico intestazioni (sinonimi italiani), anteprima con nuovi/già presenti/errori, modalità salta o aggiorna duplicati (nome+produttore+annata[+formato]), modello .xlsx scaricabile, round-trip con l'export
+- Pulsante "Importa da Excel" nello stato vuoto di Tutti i vini; voce menu rinominata "Importa, esporta e backup"
+- Testing: 16/16 test import + flussi UI OK (iteration_3)
+
 ## Backlog
 - P1: TTL cleanup login_attempts; recupero password via email
-- P2: import da Excel; logo/nome ristorante personalizzabile nella carta stampata; split server.py in routers
+- P2: logo/nome ristorante personalizzabile nella carta stampata; split server.py in routers
 
 ## Next tasks
 - Feedback utente sul primo rilascio

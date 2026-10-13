@@ -1,0 +1,20 @@
+{
+  "summary": "Tested the new Excel/CSV import feature (backend + frontend) plus light regression. 16/16 new pytest tests pass (preview synonyms Vino/Cantina/Tipo/Anno/Prezzo, ignored column list, comma-decimal '32,50 €' parsed, tipologia 'rosso' -> 'Rosso', header not on first row, missing nome -> error, invalid price -> error, duplicate rows -> error, .xls rejected with Italian message, file without header -> 400, auth required 401, mode=skip inserts only new, mode=update updates existing matched by nome+produttore+annata and preserves foto_path, /api/import/template returns valid xlsx, round-trip of /api/export/xlsx and /api/export/csv yields all rows 'presente'). Frontend: empty-state empty-import-button on /vini navigates to /backup; /backup page labeled 'Importa, esporta e backup' shows import-panel; xlsx upload opens import-preview-dialog with correct counts (nuovi=2, presenti=0, errori=1); import-mode-radio hidden when presenti=0; import-confirm-button imports and toast shows 'Importazione completata: 2 nuovi, 0 aggiornati, 0 saltati, 1 con errori'; wines then visible in /vini; re-upload shows presenti=2 and mode-radio with skip+update visible; import-cancel-button closes dialog; import-template-button visible. Existing export-excel/export-csv/download-backup buttons intact. Mobile 390px /backup has NO horizontal overflow (scrollWidth=clientWidth=390). All TEST_ data was cleaned up; DB ends with 0 wines and only the seeded admin user.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/app/backend/tests/test_import.py", "/app/backend/tests/test_carta_vini.py", "/app/test_reports/pytest/import_results.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "importer.py _price: when both ',' and '.' are present and ',' < '.', the fallback s.replace(',', '') is applied but if ',' appears AFTER '.' it does s.replace('.', '').replace(',', '.'); current logic is correct for IT and US formats but has no explicit test; consider adding a unit test for '1.234,56' and '1,234.56'.",
+    "server.py analyze_import re-parses the file in /api/import (second read via analyze_import) causing double parsing and double DB read for existing wines. For large files this doubles latency. Minor; acceptable for 10MB cap.",
+    "In server.py the `key()` lambda has a subtle precedence bug: `base + ((...),) if with_formato else base` — Python parses as `base + (((...),) if with_formato else base)`. Here it still works because when with_formato is False the expression yields `base + base` which still produces a deterministic tuple used only for lookup consistency on both sides, BUT it means when formato is NOT a column every key is doubled (base+base). This is self-consistent (both existing map and seen set use same key), so no functional bug, but it is confusing and should be rewritten as `(base + ((w.get('formato') or '').casefold(),)) if with_formato else base`.",
+    "ImportPanel: no file-size pre-check client-side; large files silently POST and only the server 400 (max 10 MB) surfaces. Minor UX nit."
+  ],
+  "updated_files": ["/app/backend/tests/test_import.py"],
+  "success_rate": {"backend": "100% (16/16 new import tests)", "frontend": "100% of exercised flows"},
+  "test_credentials": "admin@cartadeivini.it / Bordeaux-2026! (works)",
+  "seed_data_creation": "None left behind. Created and then deleted: TEST_Imp1/2/3, TEST_WithPhoto, TEST_UI_Barolo, TEST_UI_Franciacorta. Final DB: 0 wines, 1 user (admin).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Import regression tests at /app/backend/tests/test_import.py (run: pytest /app/backend/tests/test_import.py -v). They self-cleanup via module-scope autouse fixture. For UI import testing, pre-build an xlsx with openpyxl in /tmp (browser automation env does NOT have openpyxl) then use page.set_input_files on [data-testid='import-file-input']. The import-mode-radio only renders when preview.totali.presenti > 0."
+}
