@@ -50,6 +50,13 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Export/import con colonne Tipologia e Affinamento separate; carta di nuovo divisa per tipologia
 - Testing: 11/11 test backend + flussi UI OK (iteration_4)
 
+## Implemented (2026-10-13, iterazione 7)
+- Carta digitale pubblica `/carta-digitale` (senza login, sola lettura): ricerca, filtri per tipologia/consigliati, scheda vino con foto; mai prezzo di acquisto
+- API pubbliche `/api/public/carta`, `/api/public/foto/{id}`; impostazione `carta_pubblica_attiva` (GET auth, PUT admin)
+- Campo `visibile` per vino (switch nel modulo, badge "Nascosto ai clienti", colonna export/import)
+- Pannello QR code nella pagina Carta per i clienti (scarica PNG, copia link, apri, attiva/disattiva)
+- Testing: 15/15 backend + flussi UI OK (iteration_5)
+
 ## Backlog
 - P1: TTL cleanup login_attempts; recupero password via email
 - P2: logo/nome ristorante personalizzabile nella carta stampata; split server.py in routers
