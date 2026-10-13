@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { LayoutGrid, List, Plus, Wine } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { LayoutGrid, List, Plus, Wine, FileUp } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WineFilters, SORT_OPTIONS } from "@/components/WineFilters";
 import { WineCard } from "@/components/WineCard";
 import { WineList } from "@/components/WineList";
 import { WineDetailDialog } from "@/components/WineDetailDialog";
 import { WineFormDialog } from "@/components/WineFormDialog";
-import { Page, PageHeader, EmptyState, GoldButton } from "@/components/ui-kit";
+import { Page, PageHeader, EmptyState, GoldButton, GhostButton } from "@/components/ui-kit";
 import { useWines, useFacets } from "@/lib/queries";
 
 const KEYS = ["regione", "tipologia", "denominazione", "annata", "produttore"];
@@ -34,6 +34,7 @@ const ViewToggle = ({ view, setView }) => (
 
 export const WineBrowser = ({ eyebrow, title, description, fixed = {}, emptyTitle, emptyText, testid }) => {
   const [sp, setSp] = useSearchParams();
+  const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("nome");
   const [view, setViewState] = useState(() => localStorage.getItem("cdv-view") || "grid");
@@ -80,7 +81,12 @@ export const WineBrowser = ({ eyebrow, title, description, fixed = {}, emptyTitl
           <EmptyState icon={Wine} testid="wines-empty-state"
             title={hasActive ? "Nessun vino corrisponde alla ricerca" : emptyTitle}
             text={hasActive ? "Prova a modificare i filtri o la ricerca." : emptyText}
-            action={hasActive ? null : fixed.preferito ? null : <GoldButton onClick={() => setEditing({})} data-testid="empty-add-wine-button"><Plus className="h-4 w-4" /> Aggiungi il primo vino</GoldButton>} />
+            action={hasActive || fixed.preferito ? null : (
+              <div className="flex flex-wrap justify-center gap-3">
+                <GoldButton onClick={() => setEditing({})} data-testid="empty-add-wine-button"><Plus className="h-4 w-4" /> Aggiungi il primo vino</GoldButton>
+                <GhostButton onClick={() => navigate("/backup")} data-testid="empty-import-button"><FileUp className="h-4 w-4" /> Importa da Excel</GhostButton>
+              </div>
+            )} />
         ) : view === "grid" ? (
           <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" data-testid="wine-grid">
             {wines.map((w, i) => <WineCard key={w.id} wine={w} index={i} onOpen={(x) => setDetailId(x.id)} />)}

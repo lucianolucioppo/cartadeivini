@@ -17,12 +17,14 @@ from core import (db, client, logger, now_iso, hash_password, verify_password, c
 
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import FastAPI, APIRouter, Request, Response, HTTPException, Depends, UploadFile, File, Query
+from fastapi import FastAPI, APIRouter, Request, Response, HTTPException, Depends, UploadFile, File, Form, Query
 from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, EmailStr, field_validator
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
+from pydantic import ValidationError
+from importer import parse_file
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
@@ -396,9 +398,7 @@ async def export_csv(_: dict = Depends(get_current_user)):
                     headers={"Content-Disposition": f'attachment; filename="carta-dei-vini-{_stamp()}.csv"'})
 
 
-@api.get("/export/xlsx")
-async def export_xlsx(_: dict = Depends(get_current_user)):
-    wines = await fetch_wines({}, "produttore")
+def build_xlsx(wines: list[dict]) -> io.BytesIO:
     wb = Workbook()
     ws = wb.active
     ws.title = "Carta dei Vini"
@@ -420,8 +420,109 @@ async def export_xlsx(_: dict = Depends(get_current_user)):
     out = io.BytesIO()
     wb.save(out)
     out.seek(0)
-    return StreamingResponse(out, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    return out
+
+
+XLSX_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+
+@api.get("/export/xlsx")
+async def export_xlsx(_: dict = Depends(get_current_user)):
+    out = build_xlsx(await fetch_wines({}, "produttore"))
+    return StreamingResponse(out, media_type=XLSX_TYPE,
                              headers={"Content-Disposition": f'attachment; filename="carta-dei-vini-{_stamp()}.xlsx"'})
+
+
+# ---------- import ----------
+MAX_IMPORT = 10 * 1024 * 1024
+FIELD_LABELS = {"nome": "Nome", "produttore": "Produttore", "prezzo_acquisto": "Prezzo di acquisto",
+                "prezzo_carta": "Prezzo in carta"}
+
+
+@api.get("/import/template")
+async def import_template(_: dict = Depends(get_current_user)):
+    return StreamingResponse(build_xlsx([]), media_type=XLSX_TYPE,
+                             headers={"Content-Disposition": 'attachment; filename="modello-carta-dei-vini.xlsx"'})
+
+
+def _validation_messages(err: ValidationError) -> list[str]:
+    out = []
+    for e in err.errors():
+        field = e["loc"][0] if e["loc"] else ""
+        label = FIELD_LABELS.get(field, str(field).capitalize())
+        out.append(f"{label} mancante" if field in ("nome", "produttore") else f"{label} non valido")
+    return out
+
+
+async def analyze_import(file: UploadFile) -> dict:
+    raw = await file.read()
+    if len(raw) > MAX_IMPORT:
+        raise HTTPException(status_code=400, detail="File troppo grande (max 10 MB)")
+    try:
+        parsed = await asyncio.to_thread(parse_file, file.filename, raw)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    fields = set(parsed["columns"])
+    with_formato = "formato" in fields
+
+    def key(w):
+        base = (w["nome"].casefold(), w["produttore"].casefold(), (w.get("annata") or "").casefold())
+        return base + ((w.get("formato") or "").casefold(),) if with_formato else base
+
+    existing = {key(w): w["id"] for w in await db.wines.find({}, {"_id": 0, "id": 1, "nome": 1, "produttore": 1,
+                                                                "annata": 1, "formato": 1}).to_list(10000)}
+    seen, rows = set(), []
+    for r in parsed["rows"]:
+        errors, wine = list(r["errors"]), None
+        if not errors:
+            try:
+                wine = WineIn(**r["data"]).model_dump(include=fields)
+            except ValidationError as e:
+                errors = _validation_messages(e)
+        stato, existing_id = "errore", None
+        if wine:
+            k = key(wine)
+            if k in seen:
+                stato, errors = "errore", ["Riga ripetuta nel file"]
+            elif k in existing:
+                stato, existing_id = "presente", existing[k]
+            else:
+                stato = "nuovo"
+            seen.add(k)
+        d = r["data"]
+        rows.append({"riga": r["riga"], "stato": stato, "errori": errors, "wine": wine, "existing_id": existing_id,
+                     "nome": d.get("nome", ""), "produttore": d.get("produttore", ""), "annata": d.get("annata", ""),
+                     "prezzo_carta": d.get("prezzo_carta")})
+    count = lambda s: sum(1 for x in rows if x["stato"] == s)
+    return {"columns": parsed["columns"], "ignored": parsed["ignored"], "rows": rows,
+            "totali": {"righe": len(rows), "nuovi": count("nuovo"), "presenti": count("presente"), "errori": count("errore")}}
+
+
+@api.post("/import/preview")
+async def import_preview(file: UploadFile = File(...), _: dict = Depends(get_current_user)):
+    result = await analyze_import(file)
+    preview = [{k: v for k, v in r.items() if k not in ("wine", "existing_id")} for r in result["rows"][:300]]
+    return {**result, "rows": preview}
+
+
+@api.post("/import")
+async def import_wines(file: UploadFile = File(...), mode: Literal["skip", "update"] = Form("skip"),
+                       _: dict = Depends(get_current_user)):
+    result = await analyze_import(file)
+    ts = now_iso()
+    new_docs, updated = [], 0
+    for r in result["rows"]:
+        if r["stato"] == "nuovo":
+            base = WineIn(**r["wine"]).model_dump()
+            new_docs.append(Wine(**base, id=str(uuid.uuid4()), created_at=ts, updated_at=ts).model_dump())
+        elif r["stato"] == "presente" and mode == "update":
+            await db.wines.update_one({"id": r["existing_id"]}, {"$set": {**r["wine"], "updated_at": ts}})
+            updated += 1
+    if new_docs:
+        await db.wines.insert_many(new_docs)
+    t = result["totali"]
+    return {"inseriti": len(new_docs), "aggiornati": updated,
+            "saltati": t["presenti"] - updated, "errori": t["errori"]}
 
 
 # ---------- backup / restore ----------

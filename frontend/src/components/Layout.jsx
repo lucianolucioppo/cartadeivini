@@ -12,7 +12,7 @@ const MAIN = [
 ];
 const TOOLS = [
   { to: "/carta", label: "Carta per i clienti", icon: ScrollText, id: "carta" },
-  { to: "/backup", label: "Esporta e backup", icon: DatabaseBackup, id: "backup" },
+  { to: "/backup", label: "Importa, esporta e backup", icon: DatabaseBackup, id: "backup" },
   { to: "/account", label: "Account e utenti", icon: UserCog, id: "account" },
 ];
 

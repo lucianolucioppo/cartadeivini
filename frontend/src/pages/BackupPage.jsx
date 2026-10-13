@@ -5,19 +5,11 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Page, PageHeader, GoldButton, GhostButton } from "@/components/ui-kit";
+import { Page, PageHeader, Panel, GoldButton, GhostButton } from "@/components/ui-kit";
+import { ImportPanel } from "@/components/ImportPanel";
 import { api, downloadFile, formatApiError } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { useInvalidateWines, useWines } from "@/lib/queries";
-
-const Panel = ({ icon: Icon, title, text, children, testid }) => (
-  <section className="border border-avorio-200 bg-white/60 p-6 md:p-8" data-testid={testid}>
-    <Icon className="h-7 w-7 text-oro" strokeWidth={1.2} />
-    <h2 className="mt-4 font-serif text-2xl font-semibold text-bordeaux-900 md:text-3xl">{title}</h2>
-    <p className="mt-2 text-sm leading-relaxed text-ink-muted">{text}</p>
-    <div className="mt-6 flex flex-wrap gap-3">{children}</div>
-  </section>
-);
 
 const useDownload = () => {
   const [busy, setBusy] = useState(null);
@@ -89,9 +81,10 @@ export default function BackupPage() {
 
   return (
     <Page>
-      <PageHeader eyebrow="Strumenti" title="Esporta e backup" testid="backup-page"
-        description={`${wines.length} vini nel database. Esporta la carta o salva una copia completa dei dati.`} />
+      <PageHeader eyebrow="Strumenti" title="Importa, esporta e backup" testid="backup-page"
+        description={`${wines.length} vini nel database. Importa la carta da Excel, esportala o salva una copia completa dei dati.`} />
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <ImportPanel />
         <Panel icon={FileSpreadsheet} title="Esporta la carta" testid="export-panel"
           text="Tutte le schede, con prezzi di acquisto e in carta, pronte per Excel o per qualsiasi foglio di calcolo.">
           <GoldButton onClick={() => run("xlsx", "/export/xlsx", "carta-dei-vini.xlsx")} disabled={!!busy} data-testid="export-excel-button">{spin("xlsx", FileSpreadsheet)} Excel (.xlsx)</GoldButton>
