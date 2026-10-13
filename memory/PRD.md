@@ -32,6 +32,10 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Pulsante "Importa da Excel" nello stato vuoto di Tutti i vini; voce menu rinominata "Importa, esporta e backup"
 - Testing: 16/16 test import + flussi UI OK (iteration_3)
 
+## Implemented (2026-10-13, iterazione 3)
+- Etichetta "Tipologia" rinominata "Affinamento" solo nel modulo vino (su richiesta)
+- Nuovi campi testo `gradazione` e `temperatura_servizio`: modulo, dettaglio, export Excel/CSV, import (sinonimi; numeri convertiti in "13,5% vol" / "12 °C"), backup
+
 ## Backlog
 - P1: TTL cleanup login_attempts; recupero password via email
 - P2: logo/nome ristorante personalizzabile nella carta stampata; split server.py in routers

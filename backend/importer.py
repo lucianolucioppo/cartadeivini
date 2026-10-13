@@ -16,6 +16,9 @@ SYNONYMS = {
     "vitigno": ["vitigno", "vitigni", "uvaggio", "uva", "uve", "grape", "grapes"],
     "annata": ["annata", "anno", "vintage", "millesimo"],
     "formato": ["formato", "bottiglia", "capacità", "size"],
+    "gradazione": ["gradazione", "gradazione alcolica", "grado alcolico", "alcol", "vol", "% vol", "abv"],
+    "temperatura_servizio": ["temperatura di servizio", "temperatura servizio", "temperatura", "servizio",
+                             "temp servizio"],
     "prezzo_acquisto": ["prezzo di acquisto", "prezzo acquisto", "acquisto", "costo", "prezzo costo",
                         "prezzo di acquisto (€)", "costo bottiglia"],
     "prezzo_carta": ["prezzo in carta", "prezzo carta", "prezzo in carta (€)", "prezzo", "prezzo vendita",
@@ -78,7 +81,21 @@ def _tipologia(v) -> str:
     return t[:1].upper() + t[1:]
 
 
-CONVERTERS = {"prezzo_acquisto": _price, "prezzo_carta": _price, "annata": _annata, "formato": _formato,
+def _gradazione(v) -> str:
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        n = float(v) * 100 if 0 < float(v) < 1 else float(v)
+        return f"{n:g}".replace(".", ",") + "% vol"
+    return _text(v)
+
+
+def _temperatura(v) -> str:
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        return f"{float(v):g}".replace(".", ",") + " °C"
+    return _text(v)
+
+
+CONVERTERS = {"gradazione": _gradazione, "temperatura_servizio": _temperatura,
+              "prezzo_acquisto": _price, "prezzo_carta": _price, "annata": _annata, "formato": _formato,
               "tipologia": _tipologia, "preferito": lambda v: _text(v).casefold() in TRUE_VALUES}
 
 

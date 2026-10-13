@@ -10,7 +10,7 @@ import { TIPOLOGIE, REGIONI, FORMATI, DENOMINAZIONI_BASE, merge } from "@/lib/co
 
 const EMPTY = {
   nome: "", produttore: "", regione: "", denominazione: "", tipologia: "", vitigno: "", annata: "",
-  formato: "0,75 l", prezzo_acquisto: "", prezzo_carta: "", foto_path: null, note: "", preferito: false,
+  formato: "0,75 l", gradazione: "", temperatura_servizio: "", prezzo_acquisto: "", prezzo_carta: "", foto_path: null, note: "", preferito: false,
 };
 
 const toForm = (w) => ({
@@ -99,6 +99,8 @@ export const WineFormDialog = ({ open, wine, onClose, onSaved }) => {
               <Field label="Vitigno"><TextInput name="vitigno" form={form} set={set} list="dl-vitigno" placeholder="es. Nebbiolo 100%" /></Field>
               <Field label="Annata"><TextInput name="annata" form={form} set={set} inputMode="numeric" placeholder="es. 2019 oppure s.a." /></Field>
               <Field label="Formato"><TextInput name="formato" form={form} set={set} list="dl-formato" /></Field>
+              <Field label="Gradazione alcolica"><TextInput name="gradazione" form={form} set={set} placeholder="es. 13,5% vol" /></Field>
+              <Field label="Temperatura di servizio"><TextInput name="temperatura_servizio" form={form} set={set} placeholder="es. 16–18 °C" /></Field>
               <Field label="Prezzo di acquisto (€)"><TextInput name="prezzo_acquisto" form={form} set={set} inputMode="decimal" placeholder="0,00" /></Field>
               <Field label="Prezzo in carta (€)"><TextInput name="prezzo_carta" form={form} set={set} inputMode="decimal" placeholder="0,00" /></Field>
               <Field label="Note descrittive" className="sm:col-span-2">

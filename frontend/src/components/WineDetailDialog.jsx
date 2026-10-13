@@ -104,6 +104,8 @@ export const WineDetailDialog = ({ wine, onClose, onEdit }) => {
               <Meta label="Denominazione" value={wine.denominazione} testid="detail-denominazione" />
               <Meta label="Vitigno" value={wine.vitigno} testid="detail-vitigno" />
               <Meta label="Formato" value={wine.formato} testid="detail-formato" />
+              <Meta label="Gradazione alcolica" value={wine.gradazione} testid="detail-gradazione" />
+              <Meta label="Temperatura di servizio" value={wine.temperatura_servizio} testid="detail-temperatura" />
             </div>
             <div className="mt-6">
               <div className="eyebrow">Note descrittive</div>

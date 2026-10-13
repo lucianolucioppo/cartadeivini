@@ -74,6 +74,8 @@ class WineIn(BaseModel):
     vitigno: str = Field("", max_length=300)
     annata: str = Field("", max_length=20)
     formato: str = Field("", max_length=60)
+    gradazione: str = Field("", max_length=30)
+    temperatura_servizio: str = Field("", max_length=30)
     prezzo_acquisto: Optional[float] = Field(None, ge=0)
     prezzo_carta: Optional[float] = Field(None, ge=0)
     foto_path: Optional[str] = None
@@ -81,7 +83,7 @@ class WineIn(BaseModel):
     preferito: bool = False
 
     @field_validator("nome", "produttore", "regione", "denominazione", "tipologia", "vitigno", "annata",
-                     "formato", "note", mode="before")
+                     "formato", "gradazione", "temperatura_servizio", "note", mode="before")
     @classmethod
     def strip(cls, v):
         return (v or "").strip() if isinstance(v, str) or v is None else str(v).strip()
@@ -367,7 +369,8 @@ async def get_file(path: str, _: dict = Depends(get_current_user)):
 # ---------- export ----------
 COLUMNS = [("nome", "Nome"), ("produttore", "Produttore / Cantina"), ("regione", "Regione"),
            ("denominazione", "Denominazione"), ("tipologia", "Tipologia"), ("vitigno", "Vitigno"),
-           ("annata", "Annata"), ("formato", "Formato"), ("prezzo_acquisto", "Prezzo di acquisto (€)"),
+           ("annata", "Annata"), ("formato", "Formato"), ("gradazione", "Gradazione alcolica"),
+           ("temperatura_servizio", "Temperatura di servizio"), ("prezzo_acquisto", "Prezzo di acquisto (€)"),
            ("prezzo_carta", "Prezzo in carta (€)"), ("preferito", "Preferito"), ("note", "Note")]
 
 
@@ -410,10 +413,11 @@ def build_xlsx(wines: list[dict]) -> io.BytesIO:
         c.alignment = Alignment(vertical="center")
     for w in wines:
         ws.append([_cell(k, w.get(k), False) for k, _ in COLUMNS])
-    widths = [30, 28, 16, 28, 14, 26, 10, 14, 18, 18, 10, 60]
+    widths = [30, 28, 16, 28, 14, 26, 10, 14, 18, 22, 18, 18, 10, 60]
     for i, width in enumerate(widths):
         ws.column_dimensions[chr(65 + i)].width = width
-    for row in ws.iter_rows(min_row=2, min_col=9, max_col=10):
+    price_col = [k for k, _ in COLUMNS].index("prezzo_acquisto") + 1
+    for row in ws.iter_rows(min_row=2, min_col=price_col, max_col=price_col + 1):
         for c in row:
             c.number_format = '#,##0.00 "€"'
     ws.freeze_panes = "A2"
