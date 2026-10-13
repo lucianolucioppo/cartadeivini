@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field, EmailStr, field_validator
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from pydantic import ValidationError
-from importer import parse_file
+from importer import parse_file, TIPOLOGIE
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
@@ -71,6 +71,7 @@ class WineIn(BaseModel):
     regione: str = Field("", max_length=100)
     denominazione: str = Field("", max_length=200)
     tipologia: str = Field("", max_length=500)
+    affinamento: str = Field("", max_length=500)
     vitigno: str = Field("", max_length=300)
     annata: str = Field("", max_length=20)
     formato: str = Field("", max_length=60)
@@ -82,7 +83,7 @@ class WineIn(BaseModel):
     note: str = Field("", max_length=5000)
     preferito: bool = False
 
-    @field_validator("nome", "produttore", "regione", "denominazione", "tipologia", "vitigno", "annata",
+    @field_validator("nome", "produttore", "regione", "denominazione", "tipologia", "affinamento", "vitigno", "annata",
                      "formato", "gradazione", "temperatura_servizio", "note", mode="before")
     @classmethod
     def strip(cls, v):
@@ -368,7 +369,8 @@ async def get_file(path: str, _: dict = Depends(get_current_user)):
 
 # ---------- export ----------
 COLUMNS = [("nome", "Nome"), ("produttore", "Produttore / Cantina"), ("regione", "Regione"),
-           ("denominazione", "Denominazione"), ("tipologia", "Affinamento"), ("vitigno", "Vitigno"),
+           ("denominazione", "Denominazione"), ("tipologia", "Tipologia"), ("vitigno", "Vitigno"),
+           ("affinamento", "Affinamento"),
            ("annata", "Annata"), ("formato", "Formato"), ("gradazione", "Gradazione alcolica"),
            ("temperatura_servizio", "Temperatura di servizio"), ("prezzo_acquisto", "Prezzo di acquisto (€)"),
            ("prezzo_carta", "Prezzo in carta (€)"), ("preferito", "Preferito"), ("note", "Note")]
@@ -413,7 +415,7 @@ def build_xlsx(wines: list[dict]) -> io.BytesIO:
         c.alignment = Alignment(vertical="center")
     for w in wines:
         ws.append([_cell(k, w.get(k), False) for k, _ in COLUMNS])
-    widths = [30, 28, 16, 28, 14, 26, 10, 14, 18, 22, 18, 18, 10, 60]
+    widths = [30, 28, 16, 28, 14, 26, 40, 10, 14, 18, 22, 18, 18, 10, 60]
     for i, width in enumerate(widths):
         ws.column_dimensions[chr(65 + i)].width = width
     price_col = [k for k, _ in COLUMNS].index("prezzo_acquisto") + 1
@@ -597,6 +599,15 @@ app.add_middleware(
 )
 
 
+async def migrate_affinamento():
+    known = {t.casefold() for t in TIPOLOGIE}
+    async for w in db.wines.find({"affinamento": {"$exists": False}}, {"_id": 0, "id": 1, "tipologia": 1}):
+        t = w.get("tipologia") or ""
+        moved = bool(t) and t.casefold() not in known
+        update = {"affinamento": t, "tipologia": ""} if moved else {"affinamento": ""}
+        await db.wines.update_one({"id": w["id"]}, {"$set": update})
+
+
 @app.on_event("startup")
 async def startup():
     await db.users.create_index("email", unique=True)
@@ -604,6 +615,7 @@ async def startup():
     await db.wines.create_index("id", unique=True)
     await db.files.create_index("storage_path")
     await seed_admin()
+    await migrate_affinamento()
     try:
         await asyncio.to_thread(init_storage)
         logger.info("Storage initialized")

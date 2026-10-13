@@ -102,7 +102,7 @@ export const WineDetailDialog = ({ wine, onClose, onEdit }) => {
             <div className="mt-4 grid grid-cols-2 gap-x-6">
               <Meta label="Regione" value={wine.regione} testid="detail-regione" />
               <Meta label="Denominazione" value={wine.denominazione} testid="detail-denominazione" />
-              <Meta label="Affinamento" value={wine.tipologia} testid="detail-affinamento" />
+              <Meta label="Affinamento" value={wine.affinamento} testid="detail-affinamento" />
               <Meta label="Vitigno" value={wine.vitigno} testid="detail-vitigno" />
               <Meta label="Formato" value={wine.formato} testid="detail-formato" />
               <Meta label="Gradazione alcolica" value={wine.gradazione} testid="detail-gradazione" />
