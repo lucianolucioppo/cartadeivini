@@ -1,0 +1,124 @@
+{
+  "project_name": "Carta dei Vini - Sommelier & Restaurant Catalog",
+  "language": "Italian",
+  "archetype": "Luxury & Editorial Heritage (SWISS / LUXURY)",
+  "theme_strategy": {
+    "primary_mode": "dark_tinted_burgundy",
+    "secondary_mode": "light_ivory_cream",
+    "description": "Inspired by fine Italian sommelier traditions, combining rich deep burgundy (#3B0B14, #58111A, #7A1C2C), soft vintage ivory (#FAF6EE, #F2EBD9), and brushed metallic antique gold (#D4AF37, #C5A059, #E6C687) trim."
+  },
+  "color_palette": {
+    "burgundy": {
+      "deep_base": "#24060C",
+      "surface_dark": "#3B0B14",
+      "surface_card": "#4E101D",
+      "primary_brand": "#7A1C2C",
+      "hover_brand": "#962539",
+      "accent_crimson": "#B02E44"
+    },
+    "ivory_avorio": {
+      "base_light": "#FAF6EE",
+      "surface_card_light": "#F3EDE0",
+      "card_border_light": "#E5D9C3",
+      "text_dark": "#1C1412",
+      "text_muted": "#5C4E49"
+    },
+    "gold_oro": {
+      "primary": "#C5A059",
+      "bright": "#D4AF37",
+      "light_shine": "#F3E3B3",
+      "border_glow": "rgba(197, 160, 89, 0.35)",
+      "badge_bg": "rgba(197, 160, 89, 0.15)"
+    },
+    "status_tokens": {
+      "favorite_star": "#FFD700",
+      "success_green": "#2E7D32",
+      "error_red": "#C62828",
+      "info_blue": "#1565C0"
+    }
+  },
+  "typography": {
+    "font_family": {
+      "headings": "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
+      "body": "'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif",
+      "numbers_price": "'Cinzel', 'Playfair Display', serif"
+    },
+    "scale": {
+      "hero_title": "text-4xl md:text-5xl lg:text-6xl font-serif tracking-tight font-bold",
+      "section_header": "text-2xl md:text-3xl font-serif font-bold tracking-tight",
+      "card_header": "text-xl md:text-2xl font-serif font-semibold",
+      "body_text": "text-sm md:text-base font-sans leading-relaxed",
+      "meta_label": "text-xs uppercase tracking-widest font-sans font-medium text-gold"
+    }
+  },
+  "layout_architecture": {
+    "desktop": "Left collapsible burgundy-gold sidebar with brand logo, main navigation links (Tutti i vini, Produttori, Regioni e Tipologie, Preferiti, Carta Stampabile, Backup & Export), staff user status & quick action button.",
+    "mobile": "Sticky top bar with glassmorphism + bottom navigation bar with icons and quick access to major sections.",
+    "grid_system": "Responsive Bento Grid for wines (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6`), with quick switch to structured compact table list view.",
+    "padding": "Generous spacing (p-6, p-8, p-12) with gold accent borders (border border-[#C5A059]/30) and inner container padding to prevent visual collision."
+  },
+  "key_features_design": {
+    "tutti_i_vini": "Filterable gallery grid & table list toggle. Features instant search bar (nome, produttore), filter badges (regione, tipologia, denominazione, annata), and price range display.",
+    "wine_card": "High-impact card displaying label image thumbnail, wine name, producer, vintage (annata), denomination (DOCG/DOC/IGT badge), wine type (Rosso, Bianco, Rosato, Spumante, Passito badge), wine specs (vitigno, formato), price (Prezzo in Carta & Prezzo Acquisto for staff), favorite star button, quick edit & view detail sheet modal.",
+    "wine_detail_modal": "Full-bleed detail overlay with label photo zoom, sommelier description notes, full metadata grid, price comparison margin, region map/badge, edit button, and delete confirmation dialog.",
+    "produttori_section": "Alphabetical and grouped card display of all wineries/producers with bottle count badge, top wines, and quick filter filter trigger.",
+    "regioni_tipologie_section": "Visual breakdown by Italian regions (Toscana, Piemonte, Veneto, Sicilia, etc.) and wine types with interactive stats and bottle counters.",
+    "preferiti_section": "Restaurant curated top selections star collection shared among staff.",
+    "printable_carta": "Clean, elegant printable menu layout designed for customer presentation with paper background (Ivory), high-contrast typography, zero staff purchase pricing displayed, grouped beautifully by Tipologia and Region.",
+    "backup_and_export": "One-click CSV/Excel export, JSON data download with embedded/linked label assets, and restore payload dropzone.",
+    "auth_gate": "Sommelier / Staff login screen with burgundy atmosphere, vintage gold emblem, input validation, and secure session state."
+  },
+  "image_urls": {
+    "vineyard_hero_bg": "https://images.unsplash.com/photo-1596142332133-327e2a0ff006?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHwxfHx3aW5lJTIwYm90dGxlJTIwbGFiZWwlMjBsdXh1cnklMjBJdGFsaWFuJTIwd2luZSUyMGNlbGxhciUyMHZpbmV5YXJkJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3OTE4ODk0NzJ8MA&ixlib=rb-4.1.0&q=85",
+    "vineyard_landscape": "https://images.unsplash.com/photo-1611547720347-c1ba6a7dfc8d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHw0fHx3aW5lJTIwYm90dGxlJTIwbGFiZWwlMjBsdXh1cnklMjBJdGFsaWFuJTIwd2luZSUyMGNlbGxhciUyMHZpbmV5YXJkJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3OTE4ODk0NzJ8MA&ixlib=rb-4.1.0&q=85",
+    "wine_pour_dark": "https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwxfHxyZWQlMjB3aW5lJTIwZ2xhc3MlMjBkYXJrJTIwbHV4dXJ5JTIwcmVzdGF1cmFudCUyMHNvbW1lbGllciUyMHZpbmV5YXJkJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3OTE4ODk0Nzl8MA&ixlib=rb-4.1.0&q=85",
+    "wine_glass_close_up": "https://images.unsplash.com/photo-1630369160812-26c7604cbd8c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwyfHxyZWQlMjB3aW5lJTIwZ2xhc3MlMjBkYXJrJTIwbHV4dXJ5JTIwcmVzdGF1cmFudCUyMHNvbW1lbGllciUyMHZpbmV5YXJkJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3OTE4ODk0Nzl8MA&ixlib=rb-4.1.0&q=85",
+    "wine_sommelier_hand": "https://images.unsplash.com/photo-1638186095578-7e58f9f16d0d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwzfHxyZWQlMjB3aW5lJTIwZ2xhc3MlMjBkYXJrJTIwbHV4dXJ5JTIwcmVzdGF1cmFudCUyMHNvbW1lbGllciUyMHZpbmV5YXJkJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3OTE4ODk0Nzl8MA&ixlib=rb-4.1.0&q=85"
+  },
+  "testing_requirements": {
+    "rule": "All interactive elements (buttons, inputs, filters, view toggles, cards, action items) MUST include exact data-testid attributes.",
+    "sample_test_ids": [
+      "login-email-input",
+      "login-password-input",
+      "login-submit-button",
+      "nav-tutti-vini-link",
+      "nav-produttori-link",
+      "nav-regioni-link",
+      "nav-preferiti-link",
+      "nav-carta-stampabile-link",
+      "nav-backup-export-link",
+      "search-wine-input",
+      "filter-regione-select",
+      "filter-tipologia-select",
+      "filter-denominazione-select",
+      "filter-annata-select",
+      "view-mode-grid-button",
+      "view-mode-list-button",
+      "add-wine-button",
+      "wine-card-item",
+      "wine-favorite-star-button",
+      "wine-detail-trigger",
+      "wine-edit-button",
+      "wine-delete-button",
+      "confirm-delete-button",
+      "export-excel-button",
+      "export-csv-button",
+      "download-backup-button",
+      "restore-backup-input",
+      "print-carta-button"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Build the application in Italian language with full backend API persistence using FastAPI and MongoDB or SQLite.",
+    "Implement the dark burgundy (#24060C / #3B0B14) & gold accent UI theme with optional ivory mode for the printable Carta dei Vini.",
+    "Ensure the design radiates Italian high-end gastronomy aesthetics: fine typography, elegant borders, gold badge indicators, smooth state transitions.",
+    "Never hide essential filters or actions; deliver instant real-time search & filtering.",
+    "Add sample realistic Italian wines (e.g., Barolo Monfortino, Amarone della Valpolicella, Brunello di Montalcino, Sassicaia, Franciacorta Annamaria Clementi, Vermentino di Gallura) so the app looks populated out of the box."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": {
+    "contrast": "Ensure text contrast meets APCA/WCAG standards. Use text shadows on photo overlays.",
+    "micro_interactions": "Add hover glows, gold outline highlight shifts, and smooth entrance transitions.",
+    "no_emoji_icons": "Use lucide-react or phosphor icons only. Never use emoji characters for navigation.",
+    "data_testid": "Strict requirement: Every input, button, select, tab, and card must have a unique kebab-case data-testid."
+  }
+}`,overwrite:true,path:

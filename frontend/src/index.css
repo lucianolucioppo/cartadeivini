@@ -1,0 +1,117 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    margin: 0;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+    :root {
+        --background: 40 56% 96%;
+        --foreground: 12 22% 9%;
+        --card: 40 45% 92%;
+        --card-foreground: 12 22% 9%;
+        --popover: 40 56% 96%;
+        --popover-foreground: 12 22% 9%;
+        --primary: 350 63% 29%;
+        --primary-foreground: 43 70% 83%;
+        --secondary: 40 45% 92%;
+        --secondary-foreground: 350 68% 14%;
+        --muted: 40 38% 89%;
+        --muted-foreground: 12 12% 33%;
+        --accent: 39 47% 56%;
+        --accent-foreground: 350 70% 9%;
+        --destructive: 0 66% 47%;
+        --destructive-foreground: 40 56% 96%;
+        --border: 38 40% 83%;
+        --input: 38 40% 80%;
+        --ring: 39 47% 56%;
+        --chart-1: 350 63% 29%;
+        --chart-2: 39 47% 56%;
+        --chart-3: 350 58% 44%;
+        --chart-4: 43 70% 83%;
+        --chart-5: 12 22% 9%;
+        --radius: 0.25rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
+    ::selection {
+        background: #c5a059;
+        color: #24060c;
+    }
+}
+
+@layer components {
+    .eyebrow {
+        @apply font-sans text-[10px] font-semibold uppercase tracking-[0.25em] text-oro-dark;
+    }
+    .gold-rule {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #c5a059 20%, #c5a059 80%, transparent);
+    }
+    .grain::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.07;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    }
+    .field {
+        @apply h-11 w-full rounded-sm border border-avorio-300 bg-white/70 px-3 text-sm text-ink placeholder:text-ink-muted/60 transition-colors focus:border-oro focus:outline-none focus:ring-2 focus:ring-oro/30;
+    }
+}
+
+@media print {
+    @page {
+        margin: 14mm 12mm;
+    }
+    body {
+        background: #fff !important;
+    }
+}
+
+@layer base {
+    [data-debug-wrapper="true"] {
+        display: contents !important;
+    }
+
+    [data-debug-wrapper="true"] > * {
+        margin-left: inherit;
+        margin-right: inherit;
+        margin-top: inherit;
+        margin-bottom: inherit;
+        padding-left: inherit;
+        padding-right: inherit;
+        padding-top: inherit;
+        padding-bottom: inherit;
+        column-gap: inherit;
+        row-gap: inherit;
+        gap: inherit;
+        border-left-width: inherit;
+        border-right-width: inherit;
+        border-top-width: inherit;
+        border-bottom-width: inherit;
+        border-left-style: inherit;
+        border-right-style: inherit;
+        border-top-style: inherit;
+        border-bottom-style: inherit;
+        border-left-color: inherit;
+        border-right-color: inherit;
+        border-top-color: inherit;
+        border-bottom-color: inherit;
+    }
+}
