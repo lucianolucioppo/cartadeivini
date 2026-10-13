@@ -16,7 +16,7 @@ load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 ADMIN_EMAIL = os.environ["ADMIN_EMAIL"]
 ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 
-STAFF_EMAIL = "TEST_pubstaff@cartadeivini.it"
+STAFF_EMAIL = "test_pubstaff@cartadeivini.it"
 STAFF_PASSWORD = f"Tst-{uuid.uuid4().hex[:12]}"
 
 

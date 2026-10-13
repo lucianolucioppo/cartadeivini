@@ -57,6 +57,12 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Pannello QR code nella pagina Carta per i clienti (scarica PNG, copia link, apri, attiva/disattiva)
 - Testing: 15/15 backend + flussi UI OK (iteration_5)
 
+## Implemented (2026-10-13, iterazione 8 — code quality)
+- Refactor: restore() → _parse_backup/_backup_wine/_restore_photo; analyze_import → _read_import/_validate_row/_classify_row; importer.parse_file → _parse_sheet/_parse_row
+- Frontend: WineFormDialog → useWineForm hook + WineFormFields/WineFormSuggestions; WineBrowser → BrowserToolbar/WineResults/useUrlFilters/useViewMode; PublicCartaPage → pure filter/group functions
+- Tests read admin credentials from backend/.env, random staff passwords, lowercase staff emails
+- Testing: 67/67 backend + UI regression OK (iteration_6)
+
 ## Backlog
 - P1: TTL cleanup login_attempts; recupero password via email
 - P2: logo/nome ristorante personalizzabile nella carta stampata; split server.py in routers
