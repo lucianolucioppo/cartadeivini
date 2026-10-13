@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Wine } from "lucide-react";
 import { fileUrl } from "@/lib/api";
 
-export const LabelImage = ({ path, alt, className = "", fit = "cover" }) => {
+export const LabelImage = ({ path, src, alt, className = "", fit = "cover" }) => {
   const [failed, setFailed] = useState(false);
-  if (!path || failed) {
+  const url = src || fileUrl(path);
+  if (!url || failed) {
     return (
       <div className={`grain relative flex items-center justify-center bg-gradient-to-b from-bordeaux-800 to-bordeaux-950 ${className}`}>
         <Wine className="h-10 w-10 text-oro/50" strokeWidth={1} />
@@ -13,7 +14,7 @@ export const LabelImage = ({ path, alt, className = "", fit = "cover" }) => {
   }
   return (
     <img
-      src={fileUrl(path)}
+      src={url}
       alt={alt}
       loading="lazy"
       onError={() => setFailed(true)}

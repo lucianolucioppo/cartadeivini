@@ -25,6 +25,7 @@ SYNONYMS = {
     "prezzo_carta": ["prezzo in carta", "prezzo carta", "prezzo in carta (€)", "prezzo", "prezzo vendita",
                      "prezzo di vendita", "carta", "vendita", "price"],
     "preferito": ["preferito", "preferiti", "consigliato"],
+    "visibile": ["visibile", "visibile in carta digitale", "carta digitale", "pubblico"],
     "note": ["note", "note descrittive", "descrizione", "notes", "note di degustazione"],
 }
 
@@ -97,7 +98,8 @@ def _temperatura(v) -> str:
 
 CONVERTERS = {"gradazione": _gradazione, "temperatura_servizio": _temperatura,
               "prezzo_acquisto": _price, "prezzo_carta": _price, "annata": _annata, "formato": _formato,
-              "tipologia": _tipologia, "preferito": lambda v: _text(v).casefold() in TRUE_VALUES}
+              "tipologia": _tipologia, "preferito": lambda v: _text(v).casefold() in TRUE_VALUES,
+              "visibile": lambda v: not _text(v) or _text(v).casefold() in TRUE_VALUES}
 
 
 def _read_rows(filename: str, raw: bytes) -> list[list[list]]:

@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PhotoField } from "@/components/PhotoField";
+import { Switch } from "@/components/ui/switch";
 import { GoldButton, GhostButton } from "@/components/ui-kit";
 import { api, formatApiError } from "@/lib/api";
 import { useFacets, useInvalidateWines } from "@/lib/queries";
@@ -10,7 +11,7 @@ import { TIPOLOGIE, REGIONI, FORMATI, DENOMINAZIONI_BASE, merge } from "@/lib/co
 
 const EMPTY = {
   nome: "", produttore: "", regione: "", denominazione: "", tipologia: "", affinamento: "", vitigno: "", annata: "",
-  formato: "0,75 l", gradazione: "", temperatura_servizio: "", prezzo_acquisto: "", prezzo_carta: "", foto_path: null, note: "", preferito: false,
+  formato: "0,75 l", gradazione: "", temperatura_servizio: "", prezzo_acquisto: "", prezzo_carta: "", foto_path: null, note: "", preferito: false, visibile: true,
 };
 
 const toForm = (w) => ({
@@ -108,6 +109,13 @@ export const WineFormDialog = ({ open, wine, onClose, onSaved }) => {
               <Field label="Temperatura di servizio"><TextInput name="temperatura_servizio" form={form} set={set} placeholder="es. 16–18 °C" /></Field>
               <Field label="Prezzo di acquisto (€)"><TextInput name="prezzo_acquisto" form={form} set={set} inputMode="decimal" placeholder="0,00" /></Field>
               <Field label="Prezzo in carta (€)"><TextInput name="prezzo_carta" form={form} set={set} inputMode="decimal" placeholder="0,00" /></Field>
+              <div className="flex items-center justify-between gap-4 border border-avorio-300 bg-white/60 px-4 py-3 sm:col-span-2">
+                <div>
+                  <div className="eyebrow">Carta digitale</div>
+                  <div className="text-sm text-ink">Visibile ai clienti nella carta digitale</div>
+                </div>
+                <Switch checked={form.visibile} onCheckedChange={(v) => set("visibile", v)} data-testid="wine-form-visibile-switch" />
+              </div>
               <Field label="Note descrittive" className="sm:col-span-2">
                 <textarea value={form.note} onChange={(e) => set("note", e.target.value)} rows={5} data-testid="wine-form-note-input"
                   className="field h-auto py-2.5 leading-relaxed" placeholder="Profumi, gusto, abbinamenti, temperatura di servizio…" />

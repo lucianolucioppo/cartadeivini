@@ -9,6 +9,7 @@ import ProducersPage from "@/pages/ProducersPage";
 import RegionsPage from "@/pages/RegionsPage";
 import FavoritesPage from "@/pages/FavoritesPage";
 import CartaPage from "@/pages/CartaPage";
+import PublicCartaPage from "@/pages/PublicCartaPage";
 import BackupPage from "@/pages/BackupPage";
 import AccountPage from "@/pages/AccountPage";
 
@@ -38,6 +39,7 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <Routes>
+            <Route path="/carta-digitale" element={<PublicCartaPage />} />
             <Route path="/login" element={<PublicOnly><LoginPage /></PublicOnly>} />
             <Route element={<Protected><Layout /></Protected>}>
               <Route index element={<Navigate to="/vini" replace />} />

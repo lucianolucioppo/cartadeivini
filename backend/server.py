@@ -82,6 +82,7 @@ class WineIn(BaseModel):
     foto_path: Optional[str] = None
     note: str = Field("", max_length=5000)
     preferito: bool = False
+    visibile: bool = True
 
     @field_validator("nome", "produttore", "regione", "denominazione", "tipologia", "affinamento", "vitigno", "annata",
                      "formato", "gradazione", "temperatura_servizio", "note", mode="before")
@@ -105,6 +106,11 @@ class Wine(WineIn):
 
 class FavoriteIn(BaseModel):
     preferito: bool
+
+
+class SettingsIn(BaseModel):
+    carta_pubblica_attiva: bool
+
 
 
 # ---------- auth ----------
@@ -327,6 +333,52 @@ async def regions_types(_: dict = Depends(get_current_user)):
     }
 
 
+# ---------- settings & public carta ----------
+async def read_settings() -> dict:
+    doc = await db.settings.find_one({"key": "app"}, {"_id": 0}) or {}
+    return {"carta_pubblica_attiva": doc.get("carta_pubblica_attiva", True)}
+
+
+@api.get("/settings")
+async def get_settings(_: dict = Depends(get_current_user)):
+    return await read_settings()
+
+
+@api.put("/settings")
+async def update_settings(body: SettingsIn, _: dict = Depends(require_admin)):
+    await db.settings.update_one({"key": "app"}, {"$set": body.model_dump()}, upsert=True)
+    return await read_settings()
+
+
+PUBLIC_FIELDS = ["id", "nome", "produttore", "regione", "denominazione", "tipologia", "affinamento", "vitigno",
+                 "annata", "formato", "gradazione", "temperatura_servizio", "prezzo_carta", "note", "preferito"]
+
+
+async def _require_public():
+    if not (await read_settings())["carta_pubblica_attiva"]:
+        raise HTTPException(status_code=404, detail="La carta digitale non è al momento disponibile")
+
+
+@api.get("/public/carta")
+async def public_carta():
+    await _require_public()
+    wines = await fetch_wines({"visibile": {"$ne": False}}, "produttore")
+    return [{**{k: w.get(k) for k in PUBLIC_FIELDS}, "foto": bool(w.get("foto_path"))} for w in wines]
+
+
+@api.get("/public/foto/{wine_id}")
+async def public_photo(wine_id: str):
+    await _require_public()
+    w = await db.wines.find_one({"id": wine_id, "visibile": {"$ne": False}}, {"_id": 0, "foto_path": 1})
+    if not w or not w.get("foto_path"):
+        raise HTTPException(status_code=404, detail="Foto non disponibile")
+    try:
+        data, ctype = await get_object(w["foto_path"])
+    except Exception:
+        raise HTTPException(status_code=404, detail="Foto non disponibile")
+    return Response(content=data, media_type=ctype, headers={"Cache-Control": "public, max-age=3600"})
+
+
 # ---------- photos ----------
 MAX_UPLOAD = 15 * 1024 * 1024
 
@@ -373,7 +425,8 @@ COLUMNS = [("nome", "Nome"), ("produttore", "Produttore / Cantina"), ("regione",
            ("affinamento", "Affinamento"),
            ("annata", "Annata"), ("formato", "Formato"), ("gradazione", "Gradazione alcolica"),
            ("temperatura_servizio", "Temperatura di servizio"), ("prezzo_acquisto", "Prezzo di acquisto (€)"),
-           ("prezzo_carta", "Prezzo in carta (€)"), ("preferito", "Preferito"), ("note", "Note")]
+           ("prezzo_carta", "Prezzo in carta (€)"), ("preferito", "Preferito"),
+           ("visibile", "Visibile in carta digitale"), ("note", "Note")]
 
 
 def _stamp() -> str:
@@ -381,7 +434,7 @@ def _stamp() -> str:
 
 
 def _cell(key, val, for_csv):
-    if key == "preferito":
+    if key in ("preferito", "visibile"):
         return "Sì" if val else "No"
     if key.startswith("prezzo"):
         if val is None:
@@ -415,7 +468,7 @@ def build_xlsx(wines: list[dict]) -> io.BytesIO:
         c.alignment = Alignment(vertical="center")
     for w in wines:
         ws.append([_cell(k, w.get(k), False) for k, _ in COLUMNS])
-    widths = [30, 28, 16, 28, 14, 26, 40, 10, 14, 18, 22, 18, 18, 10, 60]
+    widths = [30, 28, 16, 28, 14, 26, 40, 10, 14, 18, 22, 18, 18, 10, 14, 60]
     for i, width in enumerate(widths):
         ws.column_dimensions[chr(65 + i)].width = width
     price_col = [k for k, _ in COLUMNS].index("prezzo_acquisto") + 1

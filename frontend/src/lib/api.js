@@ -38,6 +38,8 @@ export function formatApiError(err) {
 }
 
 export const fileUrl = (path) => (path ? `${API}/files/${path}` : null);
+export const publicFotoUrl = (id) => `${API}/public/foto/${id}`;
+export const PUBLIC_CARTA_PATH = "/carta-digitale";
 
 const euroFmt = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" });
 export const euro = (v) => (v == null || v === "" ? "—" : euroFmt.format(v));

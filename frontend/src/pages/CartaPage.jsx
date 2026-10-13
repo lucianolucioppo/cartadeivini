@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Printer } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Page, PageHeader, GoldButton } from "@/components/ui-kit";
+import { DigitalCartaPanel } from "@/components/DigitalCartaPanel";
 import { useWines } from "@/lib/queries";
 import { TIPOLOGIE } from "@/lib/constants";
 
@@ -58,9 +59,11 @@ export default function CartaPage() {
     <Page className="print:max-w-none print:p-0">
       <div className="print:hidden">
         <PageHeader eyebrow="Per gli ospiti" title="Carta per i clienti" testid="carta-page"
-          description="Versione da consultare o stampare, senza prezzi di acquisto. Prezzi in euro."
+          description="Carta digitale con QR code per i tavoli e versione da stampare. Mai i prezzi di acquisto."
           actions={<GoldButton onClick={() => window.print()} data-testid="print-carta-button"><Printer className="h-4 w-4" /> Stampa</GoldButton>} />
-        <div className="mt-6 flex flex-wrap gap-6">
+        <DigitalCartaPanel />
+        <div className="eyebrow mt-10">Carta stampabile</div>
+        <div className="mt-3 flex flex-wrap gap-6">
           <Toggle id="carta-only-favorites" label="Solo preferiti" checked={onlyFav} onChange={setOnlyFav} />
           <Toggle id="carta-show-notes" label="Mostra note descrittive" checked={showNotes} onChange={setShowNotes} />
         </div>

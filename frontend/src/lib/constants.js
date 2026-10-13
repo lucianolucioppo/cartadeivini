@@ -33,5 +33,10 @@ export const DENOMINAZIONI_BASE = ["DOCG", "DOC", "IGT", "Vino da Tavola", "AOC"
 
 export const tipoColor = (t) => TIPOLOGIA_COLORS[t] || "#C5A059";
 
+export const tipoOrder = (t) => {
+  const i = TIPOLOGIE.indexOf(t);
+  return i === -1 ? 99 : i;
+};
+
 export const merge = (...lists) =>
   [...new Set(lists.flat().filter(Boolean))].sort((a, b) => a.localeCompare(b, "it"));
