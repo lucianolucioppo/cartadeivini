@@ -95,7 +95,11 @@ export const WineFormDialog = ({ open, wine, onClose, onSaved }) => {
               <Field label="Produttore o cantina" required className="sm:col-span-2"><TextInput name="produttore" form={form} set={set} list="dl-produttore" /></Field>
               <Field label="Regione"><TextInput name="regione" form={form} set={set} list="dl-regione" /></Field>
               <Field label="Denominazione"><TextInput name="denominazione" form={form} set={set} list="dl-denominazione" placeholder="es. Barolo DOCG" /></Field>
-              <Field label="Affinamento"><TextInput name="tipologia" form={form} set={set} list="dl-tipologia" placeholder="es. 18 mesi in barrique" /></Field>
+              <Field label="Affinamento" className="sm:col-span-2">
+                <textarea value={form.tipologia} onChange={(e) => set("tipologia", e.target.value)} rows={3} maxLength={500} data-testid="wine-form-tipologia-input"
+                  className="field h-auto py-2.5 leading-relaxed" placeholder="es. 18 mesi in barrique di rovere francese, poi 12 mesi in bottiglia" />
+                <span className="mt-1 block text-right text-[11px] text-ink-muted" data-testid="affinamento-char-count">{form.tipologia.length}/500</span>
+              </Field>
               <Field label="Vitigno"><TextInput name="vitigno" form={form} set={set} list="dl-vitigno" placeholder="es. Nebbiolo 100%" /></Field>
               <Field label="Annata"><TextInput name="annata" form={form} set={set} inputMode="numeric" placeholder="es. 2019 oppure s.a." /></Field>
               <Field label="Formato"><TextInput name="formato" form={form} set={set} list="dl-formato" /></Field>
@@ -112,7 +116,6 @@ export const WineFormDialog = ({ open, wine, onClose, onSaved }) => {
           <Options id="dl-produttore" values={facets.produttore || []} />
           <Options id="dl-regione" values={merge(REGIONI, facets.regione || [])} />
           <Options id="dl-denominazione" values={merge(DENOMINAZIONI_BASE, facets.denominazione || [])} />
-          <Options id="dl-tipologia" values={facets.tipologia || []} />
           <Options id="dl-vitigno" values={facets.vitigno || []} />
           <Options id="dl-formato" values={merge(FORMATI, facets.formato || [])} />
           <div className="mt-8 flex flex-col-reverse gap-3 border-t border-avorio-200 pt-6 sm:flex-row sm:justify-end">

@@ -92,7 +92,7 @@ export const WineDetailDialog = ({ wine, onClose, onEdit }) => {
                   {wine.nome}
                 </DialogTitle>
                 <DialogDescription className="mt-2 flex items-center gap-3 text-ink-muted">
-                  <TipoBadge tipo={wine.tipologia} />
+                  <TipoBadge tipo={wine.tipologia} className="max-w-[16rem]" />
                   <span className="font-display text-sm">{wine.annata || "s.a."}</span>
                 </DialogDescription>
               </div>

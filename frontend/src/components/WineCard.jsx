@@ -5,9 +5,9 @@ import { tipoColor } from "@/lib/constants";
 
 export const TipoBadge = ({ tipo, className = "" }) =>
   tipo ? (
-    <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] ${className}`}>
-      <span className="h-2 w-2 rounded-full ring-1 ring-white/40" style={{ background: tipoColor(tipo) }} />
-      {tipo}
+    <span title={tipo} className={`inline-flex min-w-0 max-w-full items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] ${className}`}>
+      <span className="h-2 w-2 shrink-0 rounded-full ring-1 ring-white/40" style={{ background: tipoColor(tipo) }} />
+      <span className="truncate">{tipo}</span>
     </span>
   ) : null;
 
@@ -21,7 +21,7 @@ export const WineCard = ({ wine, onOpen, index = 0 }) => (
     <div className="relative aspect-[4/5] overflow-hidden bg-bordeaux-950">
       <LabelImage path={wine.foto_path} alt={wine.nome} className="h-full w-full transition-transform duration-700 group-hover:scale-105" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-bordeaux-950/85 to-transparent" />
-      <TipoBadge tipo={wine.tipologia} className="absolute left-3 top-3 bg-bordeaux-950/70 px-2.5 py-1 text-avorio-50 backdrop-blur-md" />
+      <TipoBadge tipo={wine.tipologia} className="absolute left-3 top-3 max-w-[calc(100%-4.5rem)] bg-bordeaux-950/70 px-2.5 py-1 text-avorio-50 backdrop-blur-md" />
       <FavoriteButton wine={wine} className="absolute right-2 top-2 bg-bordeaux-950/60 text-avorio-50 backdrop-blur-md" />
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4">
         <span className="font-display text-xs tracking-widest text-oro-light/90">{wine.annata || "s.a."}</span>

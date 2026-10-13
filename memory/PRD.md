@@ -41,6 +41,9 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Carta per i clienti: gradazione e "servire a …" sotto ogni vino
 - Invariati: nome sezione "Regioni e tipologie", pannello "Per tipologia"; la carta raggruppa ancora per il valore di questo campo
 
+## Implemented (2026-10-13, iterazione 5)
+- Campo Affinamento (`tipologia`): limite portato a 500 caratteri, textarea a tutta larghezza con contatore; badge su card/dettaglio troncati con tooltip
+
 ## Backlog
 - P1: TTL cleanup login_attempts; recupero password via email
 - P2: logo/nome ristorante personalizzabile nella carta stampata; split server.py in routers

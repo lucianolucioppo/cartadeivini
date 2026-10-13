@@ -11,7 +11,7 @@ const FilterSelect = ({ label, value, onChange, options, testid }) => (
     >
       <SelectValue placeholder={label} />
     </SelectTrigger>
-    <SelectContent className="max-h-72">
+    <SelectContent className="max-h-72 max-w-[min(90vw,28rem)]">
       <SelectItem value={ALL}>{label}: tutte</SelectItem>
       {options.map((o) => (
         <SelectItem key={o} value={o}>{o}</SelectItem>

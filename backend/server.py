@@ -70,7 +70,7 @@ class WineIn(BaseModel):
     produttore: str = Field(min_length=1, max_length=200)
     regione: str = Field("", max_length=100)
     denominazione: str = Field("", max_length=200)
-    tipologia: str = Field("", max_length=60)
+    tipologia: str = Field("", max_length=500)
     vitigno: str = Field("", max_length=300)
     annata: str = Field("", max_length=20)
     formato: str = Field("", max_length=60)
