@@ -1,0 +1,26 @@
+{
+  "summary": "Iteration 7 — frontend-only regression on the close-button bug fix in /app/frontend/src/components/ui/dialog.jsx and sheet.jsx. Verified at 390x844 and 1920x800. PUBLIC /carta-digitale (no auth): tapped wine 'Amaranta' row (public-wine-<id>) → public-wine-sheet opened; sheet-close-button rendered as a 40x40 round ivory button (bordeaux X icon 20x20 svg, aria-label 'Chiudi') at top-right over the dark hero area — clearly a round X, not a plain square. Tapping it closed the sheet both on mobile (bbox 338,80 40x40) and desktop (bbox 1244,77 40x40). STAFF (admin@cartadeivini.it / Bordeaux-2026!): /vini → wine-card click opens wine-detail-dialog; dialog-close-button is 40x40 round at top-right (desktop 1419,58; mobile 337,38). On desktop the detail-favorite-button sits at 1375,82 36x36 — no overlap with the close button. On mobile 390px the photo is on top, favorite button at 305,338 — far below the close X, no overlap. Both devices: X click closes the dialog. wine-form-dialog (opened via add-wine-button) uses the same shared dialog-close-button and closes correctly. Mobile-only 'Altro' sheet (mobile-nav-more-button) shows the ivory round X at 338,534 on the dark burgundy background and closes on tap. Screenshots captured confirm the X icon is clearly rendered (lucide X at h-5 w-5 strokeWidth=2) inside the ivory/oro-bordered circle. Code review of dialog.jsx line 37-43 and sheet.jsx line 50-56 confirms consistent implementation with data-testid, aria-label 'Chiudi', focus-visible ring only (no persistent focus square), and z-20 to float above content.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "dialog.jsx and sheet.jsx now have duplicated close-button markup (identical 7-line className). Minor DRY — could extract a shared <CloseIconButton/> primitive, but acceptable given shadcn convention of keeping ui/* self-contained.",
+    "The close button uses `absolute right-3 top-3` which places it at ~12px from the edge; combined with the 40x40 size and h-5 X, visual target is comfortable (>44px tap area including padding/scale-hover). WCAG AA tap size satisfied.",
+    "focus-visible:ring-2 ring-oro only (no `focus:ring`) correctly removes the mouse-focus square that originally caused the 'quadrato' complaint. Good.",
+    "Pre-existing (iter5+): PublicCartaPage still triggers 3-6 /auth/me 401s in the browser console on the public URL — cosmetic/privacy nit, unchanged by this fix.",
+    "detail-favorite-button on desktop sits ~44px to the left of the close X (gap ≈8px). Visually fine today but any future increase in the close button width could cause overlap — consider aligning them in a flex row or giving the favorite button more left-margin on desktop."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (not tested per request)", "frontend": "100% of exercised close-button flows (public sheet mobile+desktop, wine-detail-dialog mobile+desktop, wine-form-dialog, mobile 'Altro' sheet)"},
+  "test_credentials": "admin@cartadeivini.it / Bordeaux-2026! (works)",
+  "seed_data_creation": "None. Real customer wine 'Amaranta' (Tenuta Ulisse) opened and closed only; not modified.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Close-button bug fix verified end-to-end. Shared testids: sheet-close-button (sheet.jsx, 40x40 round, X svg 20x20), dialog-close-button (dialog.jsx, same). Both have aria-label='Chiudi'. On desktop detail dialog the close X is at right-3 top-3 and does NOT overlap detail-favorite-button (which sits ~44px to its left with -top-6 translation). Mobile 390: photo stacks on top, close X at top-right over the photo, favorite stays with the info section ~300px below. mobile-nav-more-button opens a right-side Sheet whose close button also uses sheet-close-button testid.",
+  "rca of the issue": "Original bug: the shadcn default close button rendered a 16px X inside a square that gained a visible background on data-[state=open] + a persistent focus ring, producing a 'gold square' appearance over the dark label photo. Fix (already in code before this iteration): both dialog.jsx and sheet.jsx replace the default Close with a 40x40 rounded-full button (bg-avorio-50/95, border-oro/50, text-bordeaux-800) containing lucide-react <X h-5 w-5 strokeWidth={2}>, focus-visible-only ring, data-testid and aria-label. Verified visually and via bounding-box inspection at mobile and desktop. No regressions observed."
+}

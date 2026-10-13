@@ -63,6 +63,10 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Tests read admin credentials from backend/.env, random staff passwords, lowercase staff emails
 - Testing: 67/67 backend + UI regression OK (iteration_6)
 
+## Implemented (2026-10-13, iterazione 9)
+- Pulsante di chiusura di schede e finestre (Dialog/Sheet): cerchio avorio 40px con "X" bordeaux ben visibile, aria-label "Chiudi" (prima sembrava un quadrato)
+- Testing: frontend OK su 390px e desktop (iteration_7)
+
 ## Backlog
 - P1: TTL cleanup login_attempts; recupero password via email
 - P2: logo/nome ristorante personalizzabile nella carta stampata; split server.py in routers
