@@ -44,6 +44,12 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 ## Implemented (2026-10-13, iterazione 5)
 - Campo Affinamento (`tipologia`): limite portato a 500 caratteri, textarea a tutta larghezza con contatore; badge su card/dettaglio troncati con tooltip
 
+## Implemented (2026-10-13, iterazione 6)
+- Tipologia e Affinamento di nuovo separati: nuovo campo `affinamento` (max 500, textarea con contatore), `tipologia` torna tipo di vino con suggerimenti (Rosso, Bianco…)
+- Migrazione all'avvio: valori non standard di `tipologia` spostati in `affinamento`
+- Export/import con colonne Tipologia e Affinamento separate; carta di nuovo divisa per tipologia
+- Testing: 11/11 test backend + flussi UI OK (iteration_4)
+
 ## Backlog
 - P1: TTL cleanup login_attempts; recupero password via email
 - P2: logo/nome ristorante personalizzabile nella carta stampata; split server.py in routers
