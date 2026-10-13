@@ -95,7 +95,7 @@ export const WineFormDialog = ({ open, wine, onClose, onSaved }) => {
               <Field label="Produttore o cantina" required className="sm:col-span-2"><TextInput name="produttore" form={form} set={set} list="dl-produttore" /></Field>
               <Field label="Regione"><TextInput name="regione" form={form} set={set} list="dl-regione" /></Field>
               <Field label="Denominazione"><TextInput name="denominazione" form={form} set={set} list="dl-denominazione" placeholder="es. Barolo DOCG" /></Field>
-              <Field label="Tipologia"><TextInput name="tipologia" form={form} set={set} list="dl-tipologia" /></Field>
+              <Field label="Affinamento"><TextInput name="tipologia" form={form} set={set} list="dl-tipologia" /></Field>
               <Field label="Vitigno"><TextInput name="vitigno" form={form} set={set} list="dl-vitigno" placeholder="es. Nebbiolo 100%" /></Field>
               <Field label="Annata"><TextInput name="annata" form={form} set={set} inputMode="numeric" placeholder="es. 2019 oppure s.a." /></Field>
               <Field label="Formato"><TextInput name="formato" form={form} set={set} list="dl-formato" /></Field>
