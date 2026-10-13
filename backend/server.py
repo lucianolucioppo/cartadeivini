@@ -368,7 +368,7 @@ async def get_file(path: str, _: dict = Depends(get_current_user)):
 
 # ---------- export ----------
 COLUMNS = [("nome", "Nome"), ("produttore", "Produttore / Cantina"), ("regione", "Regione"),
-           ("denominazione", "Denominazione"), ("tipologia", "Tipologia"), ("vitigno", "Vitigno"),
+           ("denominazione", "Denominazione"), ("tipologia", "Affinamento"), ("vitigno", "Vitigno"),
            ("annata", "Annata"), ("formato", "Formato"), ("gradazione", "Gradazione alcolica"),
            ("temperatura_servizio", "Temperatura di servizio"), ("prezzo_acquisto", "Prezzo di acquisto (€)"),
            ("prezzo_carta", "Prezzo in carta (€)"), ("preferito", "Preferito"), ("note", "Note")]

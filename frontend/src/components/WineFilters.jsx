@@ -49,7 +49,7 @@ export const WineFilters = ({ q, setQ, filters, setFilter, facets = {}, hasActiv
     </div>
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       <FilterSelect label="Regione" value={filters.regione} onChange={(v) => setFilter("regione", v)} options={facets.regione || []} testid="filter-regione-select" />
-      <FilterSelect label="Tipologia" value={filters.tipologia} onChange={(v) => setFilter("tipologia", v)} options={facets.tipologia || []} testid="filter-tipologia-select" />
+      <FilterSelect label="Affinamento" value={filters.tipologia} onChange={(v) => setFilter("tipologia", v)} options={facets.tipologia || []} testid="filter-tipologia-select" />
       <FilterSelect label="Denominazione" value={filters.denominazione} onChange={(v) => setFilter("denominazione", v)} options={facets.denominazione || []} testid="filter-denominazione-select" />
       <FilterSelect label="Annata" value={filters.annata} onChange={(v) => setFilter("annata", v)} options={facets.annata || []} testid="filter-annata-select" />
     </div>

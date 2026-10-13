@@ -41,7 +41,8 @@ const CartaItem = ({ w, showNotes }) => (
       <span className="font-display text-base text-bordeaux-800">{price(w.prezzo_carta)}</span>
     </div>
     <div className="text-xs text-ink-muted">
-      {[w.produttore, w.denominazione, w.vitigno, w.formato].filter(Boolean).join(" · ")}
+      {[w.produttore, w.denominazione, w.vitigno, w.formato, w.gradazione,
+        w.temperatura_servizio && `servire a ${w.temperatura_servizio}`].filter(Boolean).join(" · ")}
     </div>
     {showNotes && w.note && <p className="mt-1 font-serif text-sm italic text-ink-muted">{w.note}</p>}
   </li>

@@ -12,7 +12,7 @@ SYNONYMS = {
                    "azienda agricola", "producer", "winery"],
     "regione": ["regione", "region", "provenienza", "paese"],
     "denominazione": ["denominazione", "denominazione di origine", "appellation", "doc", "docg"],
-    "tipologia": ["tipologia", "tipo", "colore", "categoria", "type"],
+    "tipologia": ["tipologia", "tipo", "colore", "categoria", "type", "affinamento", "invecchiamento"],
     "vitigno": ["vitigno", "vitigni", "uvaggio", "uva", "uve", "grape", "grapes"],
     "annata": ["annata", "anno", "vintage", "millesimo"],
     "formato": ["formato", "bottiglia", "capacità", "size"],

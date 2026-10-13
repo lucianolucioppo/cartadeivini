@@ -45,7 +45,7 @@ export const ImportPanel = () => {
 
   return (
     <Panel icon={FileUp} title="Importa da Excel" testid="import-panel" className="lg:col-span-2"
-      text="Carica la carta che usi oggi in formato .xlsx o .csv. Le colonne vengono riconosciute automaticamente (Nome, Produttore o Cantina, Regione, Denominazione, Tipologia, Vitigno, Annata, Formato, Prezzo di acquisto, Prezzo in carta, Note) e prima di confermare vedrai un'anteprima. Le foto delle etichette si aggiungono poi dalla scheda di ogni vino.">
+      text="Carica la carta che usi oggi in formato .xlsx o .csv. Le colonne vengono riconosciute automaticamente (Nome, Produttore o Cantina, Regione, Denominazione, Affinamento, Vitigno, Annata, Formato, Gradazione alcolica, Temperatura di servizio, Prezzo di acquisto, Prezzo in carta, Note) e prima di confermare vedrai un'anteprima. Le foto delle etichette si aggiungono poi dalla scheda di ogni vino.">
       <GoldButton onClick={() => input.current?.click()} disabled={busy} data-testid="import-file-button">
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileUp className="h-4 w-4" />} Scegli file Excel o CSV
       </GoldButton>

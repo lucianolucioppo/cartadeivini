@@ -36,6 +36,11 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Etichetta "Tipologia" rinominata "Affinamento" solo nel modulo vino (su richiesta)
 - Nuovi campi testo `gradazione` e `temperatura_servizio`: modulo, dettaglio, export Excel/CSV, import (sinonimi; numeri convertiti in "13,5% vol" / "12 °C"), backup
 
+## Implemented (2026-10-13, iterazione 4)
+- Campo `tipologia` mostrato come "Affinamento" in filtro, dettaglio, export (intestazione), import (sinonimi affinamento/invecchiamento); rimossi suggerimenti Rosso/Bianco dal campo
+- Carta per i clienti: gradazione e "servire a …" sotto ogni vino
+- Invariati: nome sezione "Regioni e tipologie", pannello "Per tipologia"; la carta raggruppa ancora per il valore di questo campo
+
 ## Backlog
 - P1: TTL cleanup login_attempts; recupero password via email
 - P2: logo/nome ristorante personalizzabile nella carta stampata; split server.py in routers
