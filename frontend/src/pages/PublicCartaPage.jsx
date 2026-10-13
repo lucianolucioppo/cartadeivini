@@ -34,18 +34,28 @@ const Row = ({ w, onOpen }) => (
   </li>
 );
 
+const SEARCH_FIELDS = ["nome", "produttore", "denominazione", "regione", "vitigno"];
+
+function matchesTipo(w, tipo) {
+  if (!tipo) return true;
+  if (tipo === FAV) return w.preferito;
+  return (w.tipologia || OTHER) === tipo;
+}
+
+function matchesTerm(w, term) {
+  return !term || SEARCH_FIELDS.some((f) => (w[f] || "").toLowerCase().includes(term));
+}
+
+function groupByTipologia(list) {
+  const groups = {};
+  list.forEach((w) => (groups[w.tipologia || OTHER] = groups[w.tipologia || OTHER] || []).push(w));
+  return Object.entries(groups).sort((a, b) => tipoOrder(a[0]) - tipoOrder(b[0]) || a[0].localeCompare(b[0], "it"));
+}
+
 const useFiltered = (wines, q, tipo) =>
   useMemo(() => {
     const term = q.trim().toLowerCase();
-    const list = (wines || []).filter((w) => {
-      if (tipo === FAV && !w.preferito) return false;
-      if (tipo && tipo !== FAV && (w.tipologia || OTHER) !== tipo) return false;
-      if (!term) return true;
-      return [w.nome, w.produttore, w.denominazione, w.regione, w.vitigno].some((v) => (v || "").toLowerCase().includes(term));
-    });
-    const groups = {};
-    list.forEach((w) => (groups[w.tipologia || OTHER] = groups[w.tipologia || OTHER] || []).push(w));
-    return Object.entries(groups).sort((a, b) => tipoOrder(a[0]) - tipoOrder(b[0]) || a[0].localeCompare(b[0], "it"));
+    return groupByTipologia((wines || []).filter((w) => matchesTipo(w, tipo) && matchesTerm(w, term)));
   }, [wines, q, tipo]);
 
 export default function PublicCartaPage() {

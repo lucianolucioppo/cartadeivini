@@ -2,15 +2,18 @@
 import io
 import os
 import csv
+from pathlib import Path
 import pytest
+from dotenv import load_dotenv
 import requests
 from openpyxl import Workbook, load_workbook
 
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://carta-dei-vini.preview.emergentagent.com").rstrip("/")
 API = f"{BASE_URL}/api"
 
-ADMIN_EMAIL = "admin@cartadeivini.it"
-ADMIN_PASSWORD = "Bordeaux-2026!"
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+ADMIN_EMAIL = os.environ["ADMIN_EMAIL"]
+ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 
 XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 

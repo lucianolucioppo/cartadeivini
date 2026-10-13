@@ -513,45 +513,56 @@ def _validation_messages(err: ValidationError) -> list[str]:
     return out
 
 
-async def analyze_import(file: UploadFile) -> dict:
+async def _read_import(file: UploadFile) -> dict:
     raw = await file.read()
     if len(raw) > MAX_IMPORT:
         raise HTTPException(status_code=400, detail="File troppo grande (max 10 MB)")
     try:
-        parsed = await asyncio.to_thread(parse_file, file.filename, raw)
+        return await asyncio.to_thread(parse_file, file.filename, raw)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+def _import_key(w: dict, with_formato: bool) -> tuple:
+    base = (w["nome"].casefold(), w["produttore"].casefold(), (w.get("annata") or "").casefold())
+    return base + ((w.get("formato") or "").casefold(),) if with_formato else base
+
+
+def _validate_row(r: dict, fields: set) -> tuple[Optional[dict], list[str]]:
+    if r["errors"]:
+        return None, list(r["errors"])
+    try:
+        return WineIn(**r["data"]).model_dump(include=fields), []
+    except ValidationError as e:
+        return None, _validation_messages(e)
+
+
+def _classify_row(r: dict, fields: set, with_formato: bool, existing: dict, seen: set) -> dict:
+    wine, errors = _validate_row(r, fields)
+    stato, existing_id = "errore", None
+    if wine:
+        k = _import_key(wine, with_formato)
+        if k in seen:
+            errors = ["Riga ripetuta nel file"]
+        elif k in existing:
+            stato, existing_id = "presente", existing[k]
+        else:
+            stato = "nuovo"
+        seen.add(k)
+    d = r["data"]
+    return {"riga": r["riga"], "stato": stato, "errori": errors, "wine": wine, "existing_id": existing_id,
+            "nome": d.get("nome", ""), "produttore": d.get("produttore", ""), "annata": d.get("annata", ""),
+            "prezzo_carta": d.get("prezzo_carta")}
+
+
+async def analyze_import(file: UploadFile) -> dict:
+    parsed = await _read_import(file)
     fields = set(parsed["columns"])
     with_formato = "formato" in fields
-
-    def key(w):
-        base = (w["nome"].casefold(), w["produttore"].casefold(), (w.get("annata") or "").casefold())
-        return base + ((w.get("formato") or "").casefold(),) if with_formato else base
-
-    existing = {key(w): w["id"] for w in await db.wines.find({}, {"_id": 0, "id": 1, "nome": 1, "produttore": 1,
-                                                                "annata": 1, "formato": 1}).to_list(10000)}
-    seen, rows = set(), []
-    for r in parsed["rows"]:
-        errors, wine = list(r["errors"]), None
-        if not errors:
-            try:
-                wine = WineIn(**r["data"]).model_dump(include=fields)
-            except ValidationError as e:
-                errors = _validation_messages(e)
-        stato, existing_id = "errore", None
-        if wine:
-            k = key(wine)
-            if k in seen:
-                stato, errors = "errore", ["Riga ripetuta nel file"]
-            elif k in existing:
-                stato, existing_id = "presente", existing[k]
-            else:
-                stato = "nuovo"
-            seen.add(k)
-        d = r["data"]
-        rows.append({"riga": r["riga"], "stato": stato, "errori": errors, "wine": wine, "existing_id": existing_id,
-                     "nome": d.get("nome", ""), "produttore": d.get("produttore", ""), "annata": d.get("annata", ""),
-                     "prezzo_carta": d.get("prezzo_carta")})
+    docs = await db.wines.find({}, {"_id": 0, "id": 1, "nome": 1, "produttore": 1, "annata": 1, "formato": 1}).to_list(10000)
+    existing = {_import_key(w, with_formato): w["id"] for w in docs}
+    seen: set = set()
+    rows = [_classify_row(r, fields, with_formato, existing, seen) for r in parsed["rows"]]
     count = lambda s: sum(1 for x in rows if x["stato"] == s)
     return {"columns": parsed["columns"], "ignored": parsed["ignored"], "rows": rows,
             "totali": {"righe": len(rows), "nuovi": count("nuovo"), "presenti": count("presente"), "errori": count("errore")}}
@@ -603,42 +614,48 @@ async def backup(_: dict = Depends(get_current_user)):
                     headers={"Content-Disposition": f'attachment; filename="backup-carta-dei-vini-{_stamp()}.json"'})
 
 
-@api.post("/backup/restore")
-async def restore(file: UploadFile = File(...), _: dict = Depends(require_admin)):
+def _backup_wine(raw: dict) -> Wine:
     try:
-        payload = json.loads(await file.read())
+        base = WineIn(**raw)
+    except Exception:
+        raise HTTPException(status_code=400, detail=f"Vino non valido nel backup: {raw.get('nome', '?')}")
+    ts = now_iso()
+    return Wine(**base.model_dump(), id=raw.get("id") or str(uuid.uuid4()),
+                created_at=raw.get("created_at") or ts, updated_at=raw.get("updated_at") or ts)
+
+
+def _parse_backup(raw: bytes) -> tuple[list[Wine], dict]:
+    try:
+        payload = json.loads(raw)
     except Exception:
         raise HTTPException(status_code=400, detail="File di backup non valido")
     if not isinstance(payload, dict) or payload.get("app") != "carta-dei-vini" or not isinstance(payload.get("wines"), list):
         raise HTTPException(status_code=400, detail="Il file non è un backup di Carta dei Vini")
-    wines = []
-    for raw in payload["wines"]:
-        try:
-            base = WineIn(**raw)
-        except Exception:
-            raise HTTPException(status_code=400, detail=f"Vino non valido nel backup: {raw.get('nome', '?')}")
-        ts = now_iso()
-        wines.append(Wine(**base.model_dump(), id=raw.get("id") or str(uuid.uuid4()),
-                          created_at=raw.get("created_at") or ts, updated_at=raw.get("updated_at") or ts))
-    photos = payload.get("photos") or {}
-    restored_photos = 0
+    photos = {p: i for p, i in (payload.get("photos") or {}).items() if p.startswith(f"{APP_NAME}/")}
+    return [_backup_wine(w) for w in payload["wines"]], photos
+
+
+async def _restore_photo(path: str, info: dict):
+    data = base64.b64decode(info["data"])
+    ctype = info.get("content_type") or "image/jpeg"
+    result = await put_object(path, data, ctype)
+    await db.files.update_one({"storage_path": result["path"]},
+                              {"$set": {"storage_path": result["path"], "content_type": ctype, "is_deleted": False, "size": len(data)},
+                               "$setOnInsert": {"id": str(uuid.uuid4()), "created_at": now_iso()}}, upsert=True)
+
+
+@api.post("/backup/restore")
+async def restore(file: UploadFile = File(...), _: dict = Depends(require_admin)):
+    wines, photos = _parse_backup(await file.read())
     for path, info in photos.items():
-        if not path.startswith(f"{APP_NAME}/"):
-            continue
-        data = base64.b64decode(info["data"])
-        result = await put_object(path, data, info.get("content_type") or "image/jpeg")
-        await db.files.update_one({"storage_path": result["path"]},
-                                  {"$set": {"storage_path": result["path"], "content_type": info.get("content_type") or "image/jpeg",
-                                            "is_deleted": False, "size": len(data)},
-                                   "$setOnInsert": {"id": str(uuid.uuid4()), "created_at": now_iso()}}, upsert=True)
-        restored_photos += 1
+        await _restore_photo(path, info)
     for w in wines:
-        if w.foto_path and w.foto_path not in photos:
-            w.foto_path = None if not await db.files.find_one({"storage_path": w.foto_path}) else w.foto_path
+        if w.foto_path and w.foto_path not in photos and not await db.files.find_one({"storage_path": w.foto_path}):
+            w.foto_path = None
     await db.wines.delete_many({})
     if wines:
         await db.wines.insert_many([w.model_dump() for w in wines])
-    return {"vini": len(wines), "foto": restored_photos}
+    return {"vini": len(wines), "foto": len(photos)}
 
 
 app.include_router(api)

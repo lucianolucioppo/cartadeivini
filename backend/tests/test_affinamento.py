@@ -2,15 +2,18 @@
 import io
 import os
 import csv
+from pathlib import Path
 import pytest
+from dotenv import load_dotenv
 import requests
 from openpyxl import load_workbook, Workbook
 
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://carta-dei-vini.preview.emergentagent.com").rstrip("/")
 API = f"{BASE_URL}/api"
 
-ADMIN_EMAIL = "admin@cartadeivini.it"
-ADMIN_PASSWORD = "Bordeaux-2026!"
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+ADMIN_EMAIL = os.environ["ADMIN_EMAIL"]
+ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 
 LONG_AFFINAMENTO = ("Affinamento in barrique di rovere francese di media tostatura per 18 mesi, "
                     "seguito da ulteriore sosta in acciaio e almeno 12 mesi di affinamento in bottiglia "

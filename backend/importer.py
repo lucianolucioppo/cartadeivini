@@ -142,28 +142,36 @@ def _find_header(rows):
     return None
 
 
+def _parse_row(row: list, header: list, mapping: dict) -> tuple[dict, list[str]]:
+    data, errors = {}, []
+    for idx, field in mapping.items():
+        value = row[idx] if idx < len(row) else None
+        try:
+            data[field] = CONVERTERS.get(field, _text)(value)
+        except (ValueError, TypeError):
+            errors.append(f"Valore non valido in «{_text(header[idx])}»: {_text(value)}")
+    return data, errors
+
+
+def _parse_sheet(rows: list, header_idx: int, mapping: dict) -> dict:
+    header = rows[header_idx]
+    parsed = []
+    for offset, row in enumerate(rows[header_idx + 1:], start=header_idx + 2):
+        if not any(_text(c) for c in row):
+            continue
+        data, errors = _parse_row(row, header, mapping)
+        parsed.append({"riga": offset, "data": data, "errors": errors})
+        if len(parsed) > MAX_ROWS:
+            raise ValueError(f"Il file supera il limite di {MAX_ROWS} righe")
+    return {"columns": {f: _text(header[i]) for i, f in mapping.items()},
+            "ignored": [_text(c) for i, c in enumerate(header) if i not in mapping and _text(c)],
+            "rows": parsed}
+
+
 def parse_file(filename: str, raw: bytes) -> dict:
-    """Returns {columns: {field: header}, ignored: [headers], rows: [{riga, data}]}."""
+    """Returns {columns: {field: header}, ignored: [headers], rows: [{riga, data, errors}]}."""
     for rows in _read_rows(filename, raw):
         found = _find_header(rows)
-        if not found:
-            continue
-        header_idx, mapping = found
-        header = rows[header_idx]
-        ignored = [_text(c) for i, c in enumerate(header) if i not in mapping and _text(c)]
-        parsed = []
-        for offset, row in enumerate(rows[header_idx + 1:], start=header_idx + 2):
-            if not any(_text(c) for c in row):
-                continue
-            data, errors = {}, []
-            for idx, field in mapping.items():
-                value = row[idx] if idx < len(row) else None
-                try:
-                    data[field] = CONVERTERS.get(field, _text)(value)
-                except (ValueError, TypeError):
-                    errors.append(f"Valore non valido in «{_text(header[idx])}»: {_text(value)}")
-            parsed.append({"riga": offset, "data": data, "errors": errors})
-            if len(parsed) > MAX_ROWS:
-                raise ValueError(f"Il file supera il limite di {MAX_ROWS} righe")
-        return {"columns": {f: _text(header[i]) for i, f in mapping.items()}, "ignored": ignored, "rows": parsed}
+        if found:
+            return _parse_sheet(rows, *found)
     raise ValueError("Non trovo l'intestazione: serve almeno una colonna «Nome» e una tra «Produttore», «Regione», «Prezzo»…")
