@@ -494,7 +494,7 @@ def build_xlsx(wines: list[dict]) -> io.BytesIO:
         c.alignment = Alignment(vertical="center")
     for w in wines:
         ws.append([_cell(k, w.get(k), False) for k, _ in COLUMNS])
-    widths = [30, 28, 16, 28, 14, 26, 40, 10, 14, 18, 22, 26, 18, 18, 10, 14, 10, 60]
+    widths = [30, 28, 16, 28, 14, 26, 40, 10, 14, 18, 22, 26, 18, 18, 10, 14, 10, 60, 50]
     for i, width in enumerate(widths):
         ws.column_dimensions[chr(65 + i)].width = width
     price_col = [k for k, _ in COLUMNS].index("prezzo_acquisto") + 1

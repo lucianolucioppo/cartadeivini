@@ -141,7 +141,7 @@ class TestEsaurito:
         idx = list(rows[0]).index("Esaurito")
         vals = {row[0]: row[idx] for row in rows[1:]}
         assert vals["TEST_Sold10"] == "Sì" and vals["TEST_Default10"] == "No"
-        assert list(rows[0])[-1] == "Note"
+        assert list(rows[0])[-2:] == ("Note", "Abbinamenti") or list(rows[0])[-2:] == ["Note", "Abbinamenti"]  # iter12: Abbinamenti added after Note
 
     def test_import_esaurito_mapping(self, admin):
         wb = Workbook()

@@ -1,0 +1,22 @@
+{
+  "summary": "Tested the 'abbinamenti' (food pairing) field on backend and frontend. Backend: new test_abbinamenti_iter12.py, 15/15 passing. Covered: POST trims spaces, null becomes '', default '', max 1000 (1001 returns 422); PUT persists; GET returns the value; q=<term only in abbinamenti> returns [] (excluded from search); /api/public/carta includes abbinamenti without prezzo_acquisto/fornitore; CSV/XLSX export and template have the 'Abbinamenti' column; XLSX/CSV import recognises 'Abbinamenti', 'Food pairing' and 'Abbinamento'; mode=update overwrites it, and an update from a file without the column does not wipe it; backup contains the field; a backup->restore round-trip keeps it. Full regression run in sequence (-n 0): 112/112 after updating one outdated assertion. Frontend: textarea wine-form-abbinamenti-input sits under the Note field and has maxLength 1000. Create and edit save the value and it comes back when the form is reopened. detail-abbinamenti shows it. /carta shows carta-item-abbinamenti-{id} only for the wine that has a value (0 for the one without). /carta-digitale without login: public-wine-abbinamenti shows for the wine with a value and is absent for the one without. The public client-side search does not match on abbinamenti. Mobile 390px: form and public sheet have no horizontal overflow (scrollWidth 390).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/export/xlsx", "issue": "In build_xlsx the widths list has 18 entries but COLUMNS now has 19, so the new 'Abbinamenti' column (S) gets Excel's default narrow width. Add a width (e.g. 50) to the list."}
+    ]
+  },
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/app/backend/tests/test_abbinamenti_iter12.py", "/app/test_reports/pytest/pytest_iter12.xml"],
+  "action_items": ["Optional: add a column width for 'Abbinamenti' in the widths list in build_xlsx (server.py)"],
+  "critical_code_review_comments": [
+    "build_xlsx widths list is out of sync with COLUMNS (18 vs 19). It is index-based and easy to break; consider storing the width next to each COLUMNS entry.",
+    "test_abbinamenti_iter12.py::test_restore_roundtrip restores the full DB. Do not run it in parallel (xdist) with other suites, because they interfere. Run the suite with -n 0."
+  ],
+  "updated_files": ["/app/backend/tests/test_abbinamenti_iter12.py", "/app/backend/tests/test_iter10_settings_esaurito.py (assertion updated: last columns are now Note, Abbinamenti)"],
+  "success_rate": {"backend": "100% (15/15 new, 112/112 full regression)", "frontend": "100%"},
+  "seed_data_creation": "TEST_ wines were created and then all deleted. DB holds only 'Amaranta' and the admin user. carta_pubblica_attiva=true (original), nome_ristorante=''.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run the backend suite in sequence: pytest /app/backend/tests -n 0 (the restore round-trip test wipes and reinserts all wines). Do not modify the real wine 'Amaranta'."
+}

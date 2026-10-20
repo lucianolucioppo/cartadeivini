@@ -92,6 +92,10 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Visibilità campi: casella Esaurito e interruttore Visibile spostati sotto la foto in cima al modulo vino; campo Nome del ristorante anche in cima a "Carta per i clienti" (admin), oltre che in Account e utenti
 - Testing: frontend OK (iteration_11)
 
+## Implemented (2026-10-20, iterazione 16)
+- Campo `abbinamenti` (testo libero, max 1000): modulo vino sotto le Note, dettaglio staff, carta stampabile e carta digitale (nascosto ai clienti se vuoto), export/import (colonna "Abbinamenti"), backup; escluso dalla ricerca testuale
+- Testing: 112/112 backend + UI OK, mobile 390px OK (iteration_12)
+
 ## Backlog
 - P1: snapshot automatico del catalogo prima di ogni ripristino backup
 - P1: TTL cleanup login_attempts; recupero password via email
