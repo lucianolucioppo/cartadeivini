@@ -36,19 +36,19 @@ const Toggle = ({ id, label, checked, onChange }) => (
 );
 
 const CartaItem = ({ w, showNotes }) => {
-  const meta = useMemo(() => [w.produttore, w.denominazione, w.vitigno, w.formato, w.gradazione,
-    w.temperatura_servizio && `servire a ${w.temperatura_servizio}`].filter(Boolean).join(" · "), [w]);
+  const meta = useMemo(() => [w.vitigno, w.gradazione].filter(Boolean).join(" · "), [w.vitigno, w.gradazione]);
   return (
-  <li className="break-inside-avoid py-2.5" data-testid={`carta-item-${w.id}`}>
+  <li className="break-inside-avoid py-3" data-testid={`carta-item-${w.id}`}>
+    <div className="font-display text-[11px] uppercase tracking-[0.18em] text-oro-dark" data-testid={`carta-item-produttore-${w.id}`}>{w.produttore}</div>
     <div className="flex items-baseline gap-2">
-      <span className="font-serif text-lg font-semibold text-bordeaux-900">{w.nome}</span>
+      <span className="font-serif text-xl font-semibold text-bordeaux-900" data-testid={`carta-item-nome-${w.id}`}>{w.nome}</span>
       {w.annata && <span className="font-display text-xs text-ink-muted">{w.annata}</span>}
       <span className="mx-1 flex-1 translate-y-[-3px] border-b border-dotted border-oro/60" />
-      <span className="font-display text-base text-bordeaux-800">{w.esaurito ? <span className="font-sans text-[10px] uppercase tracking-[0.15em]">Esaurito</span> : price(w.prezzo_carta)}</span>
+      <span className="font-display text-base text-bordeaux-800" data-testid={`carta-item-prezzo-${w.id}`}>{w.esaurito ? <span className="font-sans text-[10px] uppercase tracking-[0.15em]">Esaurito</span> : price(w.prezzo_carta)}</span>
     </div>
-    <div className="text-xs text-ink-muted">{meta}</div>
-    {showNotes && w.note && <p className="mt-1 font-serif text-sm italic text-ink-muted">{w.note}</p>}
+    {meta && <div className="text-xs text-ink-muted" data-testid={`carta-item-meta-${w.id}`}>{meta}</div>}
     {w.abbinamenti && <p className="mt-0.5 text-xs text-ink-muted" data-testid={`carta-item-abbinamenti-${w.id}`}><span className="text-oro-dark">Abbinamenti:</span> {w.abbinamenti}</p>}
+    {showNotes && w.note && <p className="mt-1 font-serif text-sm italic text-ink-muted" data-testid={`carta-item-note-${w.id}`}>{w.note}</p>}
   </li>
   );
 };
