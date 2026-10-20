@@ -67,7 +67,14 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Pulsante di chiusura di schede e finestre (Dialog/Sheet): cerchio avorio 40px con "X" bordeaux ben visibile, aria-label "Chiudi" (prima sembrava un quadrato)
 - Testing: frontend OK su 390px e desktop (iteration_7)
 
+## Implemented (2026-10-20, iterazione 10 — code quality 2)
+- Backend: helper load_object/_compress_upload/_store_photo, _backup_wine/_load_json, core._jwt_decode (nessuna variabile "forse non definita")
+- Restore: file con vini non-oggetto o foto non valide → 400 invece di 500
+- Frontend: AuthContext con useMemo/useCallback; useMemo in RegionCard, CartaItem, PublicWineSheet, Row pubblica; PublicCartaPage → usePublicCarta + FilterBar; ImportPreviewDialog → Summary/ModeChoice/ImportFooter
+- Testing: 67/67 + 15/15 backend, UI OK (iteration_8)
+
 ## Backlog
+- P1: snapshot automatico del catalogo prima di ogni ripristino backup
 - P1: TTL cleanup login_attempts; recupero password via email
 - P2: logo/nome ristorante personalizzabile nella carta stampata; split server.py in routers
 

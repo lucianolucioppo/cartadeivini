@@ -643,7 +643,10 @@ def _parse_backup(raw: bytes) -> tuple[list[Wine], dict]:
     payload = _load_json(raw)
     if not isinstance(payload, dict) or payload.get("app") != "carta-dei-vini" or not isinstance(payload.get("wines"), list):
         raise HTTPException(status_code=400, detail="Il file non è un backup di Carta dei Vini")
-    photos = {p: i for p, i in (payload.get("photos") or {}).items() if p.startswith(f"{APP_NAME}/")}
+    raw_photos = payload.get("photos") or {}
+    if not isinstance(raw_photos, dict) or not all(isinstance(w, dict) for w in payload["wines"]):
+        raise HTTPException(status_code=400, detail="File di backup non valido")
+    photos = {p: i for p, i in raw_photos.items() if p.startswith(f"{APP_NAME}/") and isinstance(i, dict)}
     return [_backup_wine(w) for w in payload["wines"]], photos
 
 

@@ -1,0 +1,31 @@
+{
+  "summary": "Refactor regression (iteration 8). Backend: 67/67 tests in the existing 4 suites pass when run serially (-n0); run in parallel with xdist, 8 fail because the tests depend on order, same as before and not caused by the refactor. New test_refactor_iter8.py: 15/15 pass (expired token -> 401 'Sessione scaduta', invalid token or refresh-as-access -> 401 'Token non valido', refresh/logout, upload jpeg -> path, non-image -> 400, corrupt image -> 400 'Immagine non leggibile', /files with auth 200 / without 401 / unknown 404, public foto 200 visible / 404 hidden, real Amaranta photo 200, restore invalid JSON / no marker / invalid wine -> 400 with catalog untouched, staff -> 403). Frontend (Playwright): login -> logout -> /regioni redirects to /login -> login again works; /regioni cards with chips sorted by count (Rosso·2 before Bianco·1); /carta meta line 'produttore · denominazione · vitigno · formato · gradazione · servire a X' and the 'Solo preferiti' toggle; /carta-digitale with Tutti/Consigliati/tipologia chips, search (nome + vitigno), empty state, row meta 'denominazione · annata', sheet subtitle 'Rosso · 2020 · 0,75 l'; import dialog shows counts, mode radio only when presenti>0, label changes with mode, cancel closes, confirm imports with a success toast. No behaviour regressions from the refactor. INCIDENT: one probe of mine (photos: [] in the backup) passed validation and ran a real restore. It replaced the real catalog for about 1 minute. It was restored at once from a mongoexport snapshot taken beforehand (same _id and all fields; photo still served 200).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/backup/restore", "issue": "A backup whose 'wines' list has a non-dict item (e.g. [\"x\"]) returns 500 instead of 400. In _backup_wine, WineIn(**raw) raises TypeError, which is not caught. A 'photos' value that is a non-dict but truthy (e.g. a list or string) would also crash on .items(). Probably the same before the refactor. No data loss: the error is raised before delete_many."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/test_refactor_iter8.py", "/app/backend/tests/test_carta_vini.py", "/app/backend/tests/test_import.py", "/app/backend/tests/test_affinamento.py", "/app/backend/tests/test_public_carta.py", "/app/test_reports/pytest/pytest_results_iter8.xml"],
+  "action_items": [
+    "Optional: in _backup_wine / _parse_backup, reject non-dict wine items and non-dict photos with a 400 'File di backup non valido' (catch TypeError or check isinstance).",
+    "Optional: the restore endpoint has no confirmation or safety net. Any well-formed JSON with app marker 'carta-dei-vini' and a valid wines list wipes the catalog. Consider an automatic server-side snapshot before delete_many."
+  ],
+  "critical_code_review_comments": [
+    "ImportPreviewDialog keeps the 'mode' state between previews because the component stays mounted while preview is null. If a user picked 'update' on one file, the next preview starts in 'update'. Reset mode when the preview changes, or use key={fileName}. This predates the refactor.",
+    "The backend test suites depend on test order. Run them with -n0, otherwise xdist gives 8 false failures.",
+    "server.py is 710 lines, just above the 700-line guideline."
+  ],
+  "updated_files": ["/app/backend/tests/test_refactor_iter8.py"],
+  "success_rate": {"backend": "100% (82/82 serial)", "frontend": "100%"},
+  "seed_data_creation": "Temporary TEST_UIRosso1/2, TEST_UIBianco, TEST_ImpNew2 and TEST_Foto8 wines plus a test_staff_iter8 user; all deleted. Final DB: only Amaranta (real), admin user, carta_pubblica_attiva=true.",
+  "test_credentials": "admin@cartadeivini.it / from /app/memory/test_credentials.md (bcrypt $2b$ confirmed)",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run pytest with -n0. Real customer wine 'Amaranta' (id eb16d5d9-...) with a photo. Never POST /backup/restore with a payload that passes validation: it wipes the catalog. Before any restore probe, take a mongoexport snapshot of wines and files."
+}
