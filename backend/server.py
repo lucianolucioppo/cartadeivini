@@ -78,6 +78,7 @@ class WineIn(BaseModel):
     gradazione: str = Field("", max_length=30)
     temperatura_servizio: str = Field("", max_length=30)
     prezzo_acquisto: Optional[float] = Field(None, ge=0)
+    fornitore: str = Field("", max_length=200)
     prezzo_carta: Optional[float] = Field(None, ge=0)
     foto_path: Optional[str] = None
     note: str = Field("", max_length=5000)
@@ -85,7 +86,7 @@ class WineIn(BaseModel):
     visibile: bool = True
 
     @field_validator("nome", "produttore", "regione", "denominazione", "tipologia", "affinamento", "vitigno", "annata",
-                     "formato", "gradazione", "temperatura_servizio", "note", mode="before")
+                     "formato", "gradazione", "temperatura_servizio", "fornitore", "note", mode="before")
     @classmethod
     def strip(cls, v):
         return (v or "").strip() if isinstance(v, str) or v is None else str(v).strip()
@@ -239,7 +240,7 @@ async def list_wines(q: Optional[str] = None, regione: Optional[str] = None, tip
 @api.get("/wines/facets")
 async def wine_facets(_: dict = Depends(get_current_user)):
     out = {}
-    for key in ("regione", "tipologia", "denominazione", "annata", "produttore", "vitigno", "formato"):
+    for key in ("regione", "tipologia", "denominazione", "annata", "produttore", "vitigno", "formato", "fornitore"):
         values = [v for v in await db.wines.distinct(key) if v]
         out[key] = sorted(values, reverse=True) if key == "annata" else sorted(values, key=str.casefold)
     return out
@@ -433,7 +434,8 @@ COLUMNS = [("nome", "Nome"), ("produttore", "Produttore / Cantina"), ("regione",
            ("denominazione", "Denominazione"), ("tipologia", "Tipologia"), ("vitigno", "Vitigno"),
            ("affinamento", "Affinamento"),
            ("annata", "Annata"), ("formato", "Formato"), ("gradazione", "Gradazione alcolica"),
-           ("temperatura_servizio", "Temperatura di servizio"), ("prezzo_acquisto", "Prezzo di acquisto (€)"),
+           ("temperatura_servizio", "Temperatura di servizio"), ("fornitore", "Fornitore"),
+           ("prezzo_acquisto", "Prezzo di acquisto (€)"),
            ("prezzo_carta", "Prezzo in carta (€)"), ("preferito", "Preferito"),
            ("visibile", "Visibile in carta digitale"), ("note", "Note")]
 
@@ -477,7 +479,7 @@ def build_xlsx(wines: list[dict]) -> io.BytesIO:
         c.alignment = Alignment(vertical="center")
     for w in wines:
         ws.append([_cell(k, w.get(k), False) for k, _ in COLUMNS])
-    widths = [30, 28, 16, 28, 14, 26, 40, 10, 14, 18, 22, 18, 18, 10, 14, 60]
+    widths = [30, 28, 16, 28, 14, 26, 40, 10, 14, 18, 22, 26, 18, 18, 10, 14, 60]
     for i, width in enumerate(widths):
         ws.column_dimensions[chr(65 + i)].width = width
     price_col = [k for k, _ in COLUMNS].index("prezzo_acquisto") + 1

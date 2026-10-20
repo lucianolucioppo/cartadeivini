@@ -28,6 +28,7 @@ const DETAIL_FIELDS = [
   ["gradazione", "Gradazione alcolica", { placeholder: "es. 13,5% vol" }],
   ["temperatura_servizio", "Temperatura di servizio", { placeholder: "es. 16–18 °C" }],
   ["prezzo_acquisto", "Prezzo di acquisto (€)", { inputMode: "decimal", placeholder: "0,00" }],
+  ["fornitore", "Fornitore", { list: "dl-fornitore", placeholder: "es. Distribuzione Vini Srl" }],
   ["prezzo_carta", "Prezzo in carta (€)", { inputMode: "decimal", placeholder: "0,00" }],
 ];
 
@@ -77,5 +78,6 @@ export const WineFormSuggestions = ({ facets }) => (
     <Options id="dl-tipologia" values={merge(TIPOLOGIE, facets.tipologia || [])} />
     <Options id="dl-vitigno" values={facets.vitigno || []} />
     <Options id="dl-formato" values={merge(FORMATI, facets.formato || [])} />
+    <Options id="dl-fornitore" values={facets.fornitore || []} />
   </>
 );

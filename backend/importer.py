@@ -20,6 +20,7 @@ SYNONYMS = {
     "gradazione": ["gradazione", "gradazione alcolica", "grado alcolico", "alcol", "vol", "% vol", "abv"],
     "temperatura_servizio": ["temperatura di servizio", "temperatura servizio", "temperatura", "servizio",
                              "temp servizio"],
+    "fornitore": ["fornitore", "distributore", "grossista", "supplier"],
     "prezzo_acquisto": ["prezzo di acquisto", "prezzo acquisto", "acquisto", "costo", "prezzo costo",
                         "prezzo di acquisto (€)", "costo bottiglia"],
     "prezzo_carta": ["prezzo in carta", "prezzo carta", "prezzo in carta (€)", "prezzo", "prezzo vendita",

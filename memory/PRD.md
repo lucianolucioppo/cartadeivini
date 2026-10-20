@@ -73,6 +73,9 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Frontend: AuthContext con useMemo/useCallback; useMemo in RegionCard, CartaItem, PublicWineSheet, Row pubblica; PublicCartaPage → usePublicCarta + FilterBar; ImportPreviewDialog → Summary/ModeChoice/ImportFooter
 - Testing: 67/67 + 15/15 backend, UI OK (iteration_8)
 
+## Implemented (2026-10-20, iterazione 11)
+- Campo interno `fornitore` accanto al prezzo di acquisto: modulo (con suggerimenti), dettaglio, export/import (colonna "Fornitore"), backup; mai mostrato nella carta pubblica o stampata
+
 ## Backlog
 - P1: snapshot automatico del catalogo prima di ogni ripristino backup
 - P1: TTL cleanup login_attempts; recupero password via email
