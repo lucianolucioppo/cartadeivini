@@ -75,11 +75,21 @@ function usePublicCarta() {
     }).catch(() => {});
   }, []);
   const tipi = useMemo(() => [...new Set((wines || []).map((w) => w.tipologia || OTHER))].sort((a, b) => tipoOrder(a) - tipoOrder(b)), [wines]);
-  const hasFav = useMemo(() => (wines || []).some((w) => w.preferito), [wines]);
-  return { wines, error, tipi, hasFav, nome };
+  const counts = useMemo(() => {
+    const c = { [FAV]: 0 };
+    (wines || []).forEach((w) => {
+      const t = w.tipologia || OTHER;
+      c[t] = (c[t] || 0) + 1;
+      if (w.preferito) c[FAV] += 1;
+    });
+    return c;
+  }, [wines]);
+  return { wines, error, tipi, counts, nome };
 }
 
-const FilterBar = ({ q, setQ, tipo, setTipo, tipi, hasFav }) => (
+const Count = ({ n, testid }) => <span className="opacity-70" data-testid={testid}>({n})</span>;
+
+const FilterBar = ({ q, setQ, tipo, setTipo, tipi, counts, total }) => (
   <div className="sticky top-0 z-10 -mx-5 space-y-3 border-b border-avorio-200 bg-avorio-50/95 px-5 py-4 backdrop-blur-xl">
     <div className="relative">
       <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-oro-dark" />
@@ -87,11 +97,11 @@ const FilterBar = ({ q, setQ, tipo, setTipo, tipi, hasFav }) => (
       {q && <button onClick={() => setQ("")} aria-label="Cancella" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted"><X className="h-4 w-4" /></button>}
     </div>
     <div className="flex flex-wrap gap-2" data-testid="public-tipo-chips">
-      <Chip active={!tipo} onClick={() => setTipo("")} testid="public-chip-all">Tutti</Chip>
-      {hasFav && <Chip active={tipo === FAV} onClick={() => setTipo(FAV)} testid="public-chip-consigliati"><Star className="h-3 w-3" /> Consigliati</Chip>}
+      <Chip active={!tipo} onClick={() => setTipo("")} testid="public-chip-all">Tutti <Count n={total} testid="public-chip-count-all" /></Chip>
+      {counts[FAV] > 0 && <Chip active={tipo === FAV} onClick={() => setTipo(FAV)} testid="public-chip-consigliati"><Star className="h-3 w-3" /> Consigliati <Count n={counts[FAV]} testid="public-chip-count-consigliati" /></Chip>}
       {tipi.map((t) => (
         <Chip key={t} active={tipo === t} onClick={() => setTipo(t)} testid={`public-chip-${t}`}>
-          <span className="h-2 w-2 rounded-full" style={{ background: tipoColor(t) }} />{t}
+          <span className="h-2 w-2 rounded-full" style={{ background: tipoColor(t) }} />{t} <Count n={counts[t]} testid={`public-chip-count-${t}`} />
         </Chip>
       ))}
     </div>
@@ -99,7 +109,7 @@ const FilterBar = ({ q, setQ, tipo, setTipo, tipi, hasFav }) => (
 );
 
 export default function PublicCartaPage() {
-  const { wines, error, tipi, hasFav, nome } = usePublicCarta();
+  const { wines, error, tipi, counts, nome } = usePublicCarta();
   const [q, setQ] = useState("");
   const [tipo, setTipo] = useState("");
   const [open, setOpen] = useState(null);
@@ -117,7 +127,7 @@ export default function PublicCartaPage() {
         {!error && !wines && <p className="mt-16 text-center font-serif text-xl italic text-ink-muted">Caricamento della carta…</p>}
         {wines && (
           <>
-            <FilterBar q={q} setQ={setQ} tipo={tipo} setTipo={setTipo} tipi={tipi} hasFav={hasFav} />
+            <FilterBar q={q} setQ={setQ} tipo={tipo} setTipo={setTipo} tipi={tipi} counts={counts} total={(wines || []).length} />
             {groups.length === 0 && (
               <div className="mt-16 flex flex-col items-center text-center text-ink-muted" data-testid="public-empty">
                 <Wine className="h-10 w-10 text-oro" strokeWidth={1} />

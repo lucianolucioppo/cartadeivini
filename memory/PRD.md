@@ -99,6 +99,9 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 ## Implemented (2026-10-20, iterazione 17)
 - Carta digitale mobile: i pulsanti delle tipologie vanno a capo su più righe invece di scorrere di lato, così si vedono tutti (verificato a 390px)
 
+## Implemented (2026-10-20, iterazione 18)
+- Carta digitale: contatore vini accanto a ogni pulsante (Tutti, Consigliati, tipologie), es. "Rosso (12)"; include anche i vini esauriti mostrati in carta
+
 ## Backlog
 - P1: snapshot automatico del catalogo prima di ogni ripristino backup
 - P1: TTL cleanup login_attempts; recupero password via email
