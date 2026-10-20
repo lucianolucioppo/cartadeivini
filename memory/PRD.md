@@ -83,6 +83,11 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Pagina Tutti i vini (e Preferiti) semplificata: pulsante "Cerca e filtra" con badge che apre un pannello laterale (ricerca + filtri produttore, regione, tipologia, denominazione, annata, fornitore; risultati live, "Mostra N vini", "Azzera"); filtri attivi come chip rimovibili
 - Testing: frontend OK su 390px e desktop (iteration_9)
 
+## Implemented (2026-10-20, iterazione 14)
+- Impostazione `nome_ristorante` (admin, pagina Account e utenti): mostrata nel menu laterale, nell'header mobile, nella carta stampabile e nella carta digitale (+ titolo pagina); endpoint pubblico GET /api/public/info
+- Casella "Esaurito" per vino: badge in galleria/elenco/dettaglio; nella carta digitale e stampata compare "Esaurito" al posto del prezzo; colonna Esaurito in export/import
+- Testing: 97/97 backend + UI OK (iteration_10); poi piccoli ritocchi (nome nell'header mobile, campo nome non sovrascritto durante la digitazione, prezzo barrato nella scheda pubblica se esaurito)
+
 ## Backlog
 - P1: snapshot automatico del catalogo prima di ogni ripristino backup
 - P1: TTL cleanup login_attempts; recupero password via email

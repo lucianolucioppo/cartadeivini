@@ -34,7 +34,7 @@ export const PublicWineSheet = ({ wine, onClose }) => {
             <SheetDescription className="mt-1 text-sm text-ink-muted">
               {subtitle}
             </SheetDescription>
-            <div className="mt-4 inline-block bg-bordeaux-950 px-4 py-2 font-display text-xl text-oro-light" data-testid="public-wine-price">{euro(wine.prezzo_carta)}</div>
+            <div className={`mt-4 inline-block bg-bordeaux-950 px-4 py-2 font-display text-xl text-oro-light ${wine.esaurito ? "line-through opacity-50" : ""}`} data-testid="public-wine-price">{euro(wine.prezzo_carta)}</div>
             {wine.esaurito && <span className="ml-3 align-middle text-xs font-semibold uppercase tracking-[0.15em] text-bordeaux-600" data-testid="public-wine-soldout">Al momento esaurito</span>}
             <div className="mt-4 grid grid-cols-2 gap-x-6">
               <Info label="Regione" value={wine.regione} />

@@ -105,12 +105,18 @@ const MobileNav = () => {
   );
 };
 
-const MobileTop = () => (
+const MobileTop = () => {
+  const { data: settings } = useSettings();
+  return (
   <header className="sticky top-0 z-30 flex items-center justify-between border-b border-oro/25 bg-bordeaux-950/95 px-5 py-3.5 backdrop-blur-xl print:hidden lg:hidden">
-    <span className="font-serif text-xl font-semibold italic text-avorio-50">Carta dei Vini</span>
-    <Wine className="h-5 w-5 text-oro" strokeWidth={1.5} />
+    <div className="min-w-0">
+      {settings?.nome_ristorante && <div className="eyebrow !text-oro/80 truncate" data-testid="mobile-restaurant-name">{settings.nome_ristorante}</div>}
+      <span className="font-serif text-xl font-semibold italic text-avorio-50">Carta dei Vini</span>
+    </div>
+    <Wine className="h-5 w-5 shrink-0 text-oro" strokeWidth={1.5} />
   </header>
-);
+  );
+};
 
 export const Layout = () => (
   <div className="min-h-screen bg-avorio-50">

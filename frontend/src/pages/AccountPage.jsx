@@ -13,13 +13,14 @@ import { useSettings } from "@/lib/queries";
 
 const RestaurantForm = () => {
   const qc = useQueryClient();
-  const { data: settings } = useSettings();
+  const { data: settings, isLoading } = useSettings();
   const [nome, setNome] = useState("");
   const [busy, setBusy] = useState(false);
+  const loaded = !isLoading;
 
   useEffect(() => {
-    setNome(settings?.nome_ristorante || "");
-  }, [settings?.nome_ristorante]);
+    if (loaded) setNome(settings?.nome_ristorante || "");
+  }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps -- initialise once after load, don't overwrite typing
 
   const submit = async (e) => {
     e.preventDefault();
@@ -38,7 +39,7 @@ const RestaurantForm = () => {
   return (
     <form onSubmit={submit} className="space-y-4">
       <Labeled label="Nome del ristorante">
-        <input className="field" maxLength={120} value={nome} onChange={(e) => setNome(e.target.value)}
+        <input className="field" maxLength={120} value={nome} onChange={(e) => setNome(e.target.value)} disabled={!loaded}
           placeholder="es. Trattoria da Mario" data-testid="restaurant-name-input" />
       </Labeled>
       <p className="text-xs text-ink-muted">Compare nel menu laterale, nella carta stampabile e nella carta digitale per i clienti.</p>
