@@ -3,7 +3,7 @@ import { Printer } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Page, PageHeader, GoldButton } from "@/components/ui-kit";
 import { DigitalCartaPanel } from "@/components/DigitalCartaPanel";
-import { useWines } from "@/lib/queries";
+import { useWines, useSettings } from "@/lib/queries";
 import { TIPOLOGIE } from "@/lib/constants";
 
 const price = (v) => (v == null ? "" : new Intl.NumberFormat("it-IT", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(v));
@@ -42,7 +42,7 @@ const CartaItem = ({ w, showNotes }) => {
       <span className="font-serif text-lg font-semibold text-bordeaux-900">{w.nome}</span>
       {w.annata && <span className="font-display text-xs text-ink-muted">{w.annata}</span>}
       <span className="mx-1 flex-1 translate-y-[-3px] border-b border-dotted border-oro/60" />
-      <span className="font-display text-base text-bordeaux-800">{price(w.prezzo_carta)}</span>
+      <span className="font-display text-base text-bordeaux-800">{w.esaurito ? <span className="font-sans text-[10px] uppercase tracking-[0.15em]">Esaurito</span> : price(w.prezzo_carta)}</span>
     </div>
     <div className="text-xs text-ink-muted">{meta}</div>
     {showNotes && w.note && <p className="mt-1 font-serif text-sm italic text-ink-muted">{w.note}</p>}
@@ -55,6 +55,7 @@ export default function CartaPage() {
   const [showNotes, setShowNotes] = useState(false);
   const { data: wines = [] } = useWines({ sort: "produttore", ...(onlyFav ? { preferito: true } : {}) });
   const groups = useMemo(() => groupWines(wines), [wines]);
+  const { data: settings } = useSettings();
 
   return (
     <Page className="print:max-w-none print:p-0">
@@ -71,7 +72,7 @@ export default function CartaPage() {
       </div>
       <article className="mx-auto mt-8 max-w-3xl border border-oro/50 bg-[#FBF8F1] px-6 py-12 shadow-[0_30px_60px_-40px_rgba(59,11,20,0.5)] sm:px-14 print:mt-0 print:max-w-none print:border-0 print:shadow-none" data-testid="carta-sheet">
         <div className="text-center">
-          <div className="eyebrow">Selezione</div>
+          <div className="font-display text-sm uppercase tracking-[0.3em] text-oro-dark" data-testid="carta-restaurant-name">{settings?.nome_ristorante || "Selezione"}</div>
           <h2 className="mt-2 font-serif text-5xl font-semibold italic text-bordeaux-900">Carta dei Vini</h2>
           <div className="gold-rule mx-auto mt-5 w-40" />
         </div>

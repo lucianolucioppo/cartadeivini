@@ -26,7 +26,10 @@ export const WineList = ({ wines, onOpen }) => (
       >
         <LabelImage path={w.foto_path} alt={w.nome} className="h-16 w-12 md:h-[72px] md:w-14" />
         <div className="min-w-0">
-          <div className="truncate font-serif text-lg font-semibold leading-tight text-bordeaux-900">{w.nome}</div>
+          <div className="truncate font-serif text-lg font-semibold leading-tight text-bordeaux-900">
+            {w.esaurito && <span className="mr-2 bg-bordeaux-600 px-1.5 py-0.5 align-middle font-sans text-[9px] font-semibold uppercase tracking-[0.12em] text-avorio-50" data-testid={`wine-row-soldout-${w.id}`}>Esaurito</span>}
+            {w.nome}
+          </div>
           <div className="truncate text-xs text-ink-muted">{w.produttore}</div>
           <div className="mt-1 flex items-center gap-3 md:hidden">
             <TipoBadge tipo={w.tipologia} className="text-ink-muted" />

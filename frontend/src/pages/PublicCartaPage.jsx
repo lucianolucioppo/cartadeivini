@@ -31,7 +31,9 @@ const Row = ({ w, onOpen }) => {
         <div className="truncate text-xs text-ink-muted">{w.produttore}</div>
         <div className="truncate text-xs text-ink-muted">{meta}</div>
       </div>
-      <span className="font-display text-base text-bordeaux-800">{euro(w.prezzo_carta)}</span>
+      <span className={`font-display text-base ${w.esaurito ? "text-xs uppercase tracking-[0.15em] text-bordeaux-600" : "text-bordeaux-800"}`} data-testid={`public-wine-price-${w.id}`}>
+        {w.esaurito ? "Esaurito" : euro(w.prezzo_carta)}
+      </span>
     </button>
   </li>
   );
@@ -64,13 +66,17 @@ const useFiltered = (wines, q, tipo) =>
 function usePublicCarta() {
   const [wines, setWines] = useState(null);
   const [error, setError] = useState("");
+  const [nome, setNome] = useState("");
   useEffect(() => {
-    document.title = "Carta dei Vini";
     axios.get(`${API}/public/carta`).then((r) => setWines(r.data)).catch((e) => setError(formatApiError(e)));
+    axios.get(`${API}/public/info`).then((r) => {
+      setNome(r.data.nome_ristorante);
+      document.title = r.data.nome_ristorante ? `Carta dei Vini — ${r.data.nome_ristorante}` : "Carta dei Vini";
+    }).catch(() => {});
   }, []);
   const tipi = useMemo(() => [...new Set((wines || []).map((w) => w.tipologia || OTHER))].sort((a, b) => tipoOrder(a) - tipoOrder(b)), [wines]);
   const hasFav = useMemo(() => (wines || []).some((w) => w.preferito), [wines]);
-  return { wines, error, tipi, hasFav };
+  return { wines, error, tipi, hasFav, nome };
 }
 
 const FilterBar = ({ q, setQ, tipo, setTipo, tipi, hasFav }) => (
@@ -93,7 +99,7 @@ const FilterBar = ({ q, setQ, tipo, setTipo, tipi, hasFav }) => (
 );
 
 export default function PublicCartaPage() {
-  const { wines, error, tipi, hasFav } = usePublicCarta();
+  const { wines, error, tipi, hasFav, nome } = usePublicCarta();
   const [q, setQ] = useState("");
   const [tipo, setTipo] = useState("");
   const [open, setOpen] = useState(null);
@@ -102,7 +108,7 @@ export default function PublicCartaPage() {
   return (
     <div className="min-h-screen bg-avorio-50" data-testid="public-carta-page">
       <header className="grain relative overflow-hidden bg-bordeaux-950 px-6 pb-10 pt-12 text-center">
-        <div className="eyebrow !text-oro/80">Selezione</div>
+        <div className="font-display text-sm uppercase tracking-[0.3em] text-oro-light/90" data-testid="public-restaurant-name">{nome || "Selezione"}</div>
         <h1 className="mt-2 font-serif text-5xl font-semibold italic text-avorio-50 sm:text-6xl">Carta dei Vini</h1>
         <div className="gold-rule mx-auto mt-5 w-40 opacity-70" />
       </header>

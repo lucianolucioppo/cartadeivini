@@ -2,11 +2,12 @@ import { useRef } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Copy, Download, ExternalLink, QrCode } from "lucide-react";
 import { toast } from "sonner";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Switch } from "@/components/ui/switch";
 import { GoldButton, GhostButton } from "@/components/ui-kit";
 import { api, formatApiError, PUBLIC_CARTA_PATH } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useSettings } from "@/lib/queries";
 
 const QR_COLORS = { fgColor: "#3B0B14", bgColor: "#FFFFFF" };
 
@@ -15,7 +16,7 @@ export const DigitalCartaPanel = () => {
   const qc = useQueryClient();
   const bigQr = useRef(null);
   const url = `${window.location.origin}${PUBLIC_CARTA_PATH}`;
-  const { data: settings } = useQuery({ queryKey: ["settings"], queryFn: async () => (await api.get("/settings")).data });
+  const { data: settings } = useSettings();
   const active = settings?.carta_pubblica_attiva ?? true;
 
   const toggle = async (v) => {

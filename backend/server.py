@@ -84,6 +84,7 @@ class WineIn(BaseModel):
     note: str = Field("", max_length=5000)
     preferito: bool = False
     visibile: bool = True
+    esaurito: bool = False
 
     @field_validator("nome", "produttore", "regione", "denominazione", "tipologia", "affinamento", "vitigno", "annata",
                      "formato", "gradazione", "temperatura_servizio", "fornitore", "note", mode="before")
@@ -110,7 +111,13 @@ class FavoriteIn(BaseModel):
 
 
 class SettingsIn(BaseModel):
-    carta_pubblica_attiva: bool
+    carta_pubblica_attiva: Optional[bool] = None
+    nome_ristorante: Optional[str] = Field(None, max_length=120)
+
+    @field_validator("nome_ristorante")
+    @classmethod
+    def strip_name(cls, v):
+        return v.strip() if isinstance(v, str) else v
 
 
 
@@ -338,7 +345,13 @@ async def regions_types(_: dict = Depends(get_current_user)):
 # ---------- settings & public carta ----------
 async def read_settings() -> dict:
     doc = await db.settings.find_one({"key": "app"}, {"_id": 0}) or {}
-    return {"carta_pubblica_attiva": doc.get("carta_pubblica_attiva", True)}
+    return {"carta_pubblica_attiva": doc.get("carta_pubblica_attiva", True),
+            "nome_ristorante": doc.get("nome_ristorante", "")}
+
+
+@api.get("/public/info")
+async def public_info():
+    return {"nome_ristorante": (await read_settings())["nome_ristorante"]}
 
 
 @api.get("/settings")
@@ -348,12 +361,12 @@ async def get_settings(_: dict = Depends(get_current_user)):
 
 @api.put("/settings")
 async def update_settings(body: SettingsIn, _: dict = Depends(require_admin)):
-    await db.settings.update_one({"key": "app"}, {"$set": body.model_dump()}, upsert=True)
+    await db.settings.update_one({"key": "app"}, {"$set": body.model_dump(exclude_none=True)}, upsert=True)
     return await read_settings()
 
 
 PUBLIC_FIELDS = ["id", "nome", "produttore", "regione", "denominazione", "tipologia", "affinamento", "vitigno",
-                 "annata", "formato", "gradazione", "temperatura_servizio", "prezzo_carta", "note", "preferito"]
+                 "annata", "formato", "gradazione", "temperatura_servizio", "prezzo_carta", "note", "preferito", "esaurito"]
 
 
 async def _require_public():
@@ -438,7 +451,7 @@ COLUMNS = [("nome", "Nome"), ("produttore", "Produttore / Cantina"), ("regione",
            ("temperatura_servizio", "Temperatura di servizio"), ("fornitore", "Fornitore"),
            ("prezzo_acquisto", "Prezzo di acquisto (€)"),
            ("prezzo_carta", "Prezzo in carta (€)"), ("preferito", "Preferito"),
-           ("visibile", "Visibile in carta digitale"), ("note", "Note")]
+           ("visibile", "Visibile in carta digitale"), ("esaurito", "Esaurito"), ("note", "Note")]
 
 
 def _stamp() -> str:
@@ -446,7 +459,7 @@ def _stamp() -> str:
 
 
 def _cell(key, val, for_csv):
-    if key in ("preferito", "visibile"):
+    if key in ("preferito", "visibile", "esaurito"):
         return "Sì" if val else "No"
     if key.startswith("prezzo"):
         if val is None:
@@ -480,7 +493,7 @@ def build_xlsx(wines: list[dict]) -> io.BytesIO:
         c.alignment = Alignment(vertical="center")
     for w in wines:
         ws.append([_cell(k, w.get(k), False) for k, _ in COLUMNS])
-    widths = [30, 28, 16, 28, 14, 26, 40, 10, 14, 18, 22, 26, 18, 18, 10, 14, 60]
+    widths = [30, 28, 16, 28, 14, 26, 40, 10, 14, 18, 22, 26, 18, 18, 10, 14, 10, 60]
     for i, width in enumerate(widths):
         ws.column_dimensions[chr(65 + i)].width = width
     price_col = [k for k, _ in COLUMNS].index("prezzo_acquisto") + 1

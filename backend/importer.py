@@ -27,6 +27,7 @@ SYNONYMS = {
                      "prezzo di vendita", "carta", "vendita", "price"],
     "preferito": ["preferito", "preferiti", "consigliato"],
     "visibile": ["visibile", "visibile in carta digitale", "carta digitale", "pubblico"],
+    "esaurito": ["esaurito", "esauriti", "non disponibile", "sold out"],
     "note": ["note", "note descrittive", "descrizione", "notes", "note di degustazione"],
 }
 
@@ -100,6 +101,7 @@ def _temperatura(v) -> str:
 CONVERTERS = {"gradazione": _gradazione, "temperatura_servizio": _temperatura,
               "prezzo_acquisto": _price, "prezzo_carta": _price, "annata": _annata, "formato": _formato,
               "tipologia": _tipologia, "preferito": lambda v: _text(v).casefold() in TRUE_VALUES,
+              "esaurito": lambda v: _text(v).casefold() in TRUE_VALUES,
               "visibile": lambda v: not _text(v) or _text(v).casefold() in TRUE_VALUES}
 
 

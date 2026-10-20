@@ -17,6 +17,9 @@ export const useFacets = () =>
 export const useStats = (name) =>
   useQuery({ queryKey: ["stats", name], queryFn: async () => (await api.get(`/stats/${name}`)).data });
 
+export const useSettings = () =>
+  useQuery({ queryKey: ["settings"], queryFn: async () => (await api.get("/settings")).data });
+
 export function useInvalidateWines() {
   const qc = useQueryClient();
   return () => {

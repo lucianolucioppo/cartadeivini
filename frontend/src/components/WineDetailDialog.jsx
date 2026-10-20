@@ -94,6 +94,7 @@ export const WineDetailDialog = ({ wine, onClose, onEdit }) => {
                 <DialogDescription className="mt-2 flex items-center gap-3 text-ink-muted">
                   <TipoBadge tipo={wine.tipologia} className="max-w-[16rem]" />
                   <span className="font-display text-sm">{wine.annata || "s.a."}</span>
+                  {wine.esaurito && <span className="bg-bordeaux-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-avorio-50" data-testid="detail-soldout-badge">Esaurito</span>}
                 </DialogDescription>
               </div>
               <FavoriteButton wine={wine} testid="detail-favorite-button" className="mr-6 border border-oro/50 text-oro-dark" />

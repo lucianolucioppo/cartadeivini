@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Wine, Warehouse, MapPinned, Star, ScrollText, DatabaseBackup, UserCog, LogOut, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/context/AuthContext";
+import { useSettings } from "@/lib/queries";
 
 const MAIN = [
   { to: "/vini", label: "Tutti i vini", short: "Vini", icon: Wine, id: "vini" },
@@ -16,13 +17,16 @@ const TOOLS = [
   { to: "/account", label: "Account e utenti", icon: UserCog, id: "account" },
 ];
 
-const Brand = () => (
+const Brand = () => {
+  const { data: settings } = useSettings();
+  return (
   <div className="px-7 pt-9 pb-7">
-    <div className="eyebrow !text-oro/80">Ristorante</div>
+    <div className="eyebrow !text-oro/80 truncate" data-testid="brand-restaurant-name">{settings?.nome_ristorante || "Ristorante"}</div>
     <div className="mt-1 font-serif text-[2.1rem] font-semibold italic leading-none text-avorio-50">Carta dei Vini</div>
     <div className="gold-rule mt-5 opacity-60" />
   </div>
-);
+  );
+};
 
 const SideLink = ({ item, onClick, prefix = "nav" }) => (
   <NavLink

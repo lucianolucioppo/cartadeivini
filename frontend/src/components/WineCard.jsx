@@ -23,11 +23,18 @@ export const WineCard = ({ wine, onOpen, index = 0 }) => (
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-bordeaux-950/85 to-transparent" />
       <TipoBadge tipo={wine.tipologia} className="absolute left-3 top-3 max-w-[calc(100%-4.5rem)] bg-bordeaux-950/70 px-2.5 py-1 text-avorio-50 backdrop-blur-md" />
       <FavoriteButton wine={wine} className="absolute right-2 top-2 bg-bordeaux-950/60 text-avorio-50 backdrop-blur-md" />
-      {wine.visibile === false && (
-        <span className="absolute left-3 top-11 bg-avorio-50/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-bordeaux-700" data-testid={`wine-hidden-badge-${wine.id}`}>
-          Nascosto ai clienti
-        </span>
-      )}
+      <div className="absolute left-3 top-11 flex flex-col items-start gap-1">
+        {wine.esaurito && (
+          <span className="bg-bordeaux-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-avorio-50" data-testid={`wine-soldout-badge-${wine.id}`}>
+            Esaurito
+          </span>
+        )}
+        {wine.visibile === false && (
+          <span className="bg-avorio-50/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-bordeaux-700" data-testid={`wine-hidden-badge-${wine.id}`}>
+            Nascosto ai clienti
+          </span>
+        )}
+      </div>
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4">
         <span className="font-display text-xs tracking-widest text-oro-light/90">{wine.annata || "s.a."}</span>
         <span className="font-display text-lg text-oro-light" data-testid={`wine-card-price-${wine.id}`}>{euro(wine.prezzo_carta)}</span>
