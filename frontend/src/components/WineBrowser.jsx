@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { LayoutGrid, List, Plus, Wine, FileUp } from "lucide-react";
+import { LayoutGrid, List, Plus, Wine, FileUp, SlidersHorizontal } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { WineFilters, SORT_OPTIONS } from "@/components/WineFilters";
+import { FilterPanel, ActiveFilters, SORT_OPTIONS } from "@/components/WineFilters";
 import { WineCard } from "@/components/WineCard";
 import { WineList } from "@/components/WineList";
 import { WineDetailDialog } from "@/components/WineDetailDialog";
@@ -32,10 +32,23 @@ const ViewToggle = ({ view, setView }) => (
   </div>
 );
 
-const BrowserToolbar = ({ count, sort, setSort, view, setView }) => (
-  <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-    <div className="text-sm text-ink-muted" data-testid="wine-count">
-      <span className="font-display text-base text-bordeaux-800">{count}</span> {count === 1 ? "vino" : "vini"}
+const FilterButton = ({ activeCount, onClick }) => (
+  <button onClick={onClick} data-testid="open-filters-button"
+    className="inline-flex h-10 items-center gap-2 border border-oro/60 bg-white/60 px-4 text-xs uppercase tracking-[0.15em] text-bordeaux-800 transition-colors hover:bg-oro/15">
+    <SlidersHorizontal className="h-4 w-4" /> Cerca e filtra
+    {activeCount > 0 && (
+      <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-bordeaux-700 px-1.5 font-display text-[10px] text-oro-light" data-testid="active-filters-count">{activeCount}</span>
+    )}
+  </button>
+);
+
+const BrowserToolbar = ({ count, sort, setSort, view, setView, activeCount, onFilters }) => (
+  <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+    <div className="flex items-center gap-4">
+      <FilterButton activeCount={activeCount} onClick={onFilters} />
+      <div className="text-sm text-ink-muted" data-testid="wine-count">
+        <span className="font-display text-base text-bordeaux-800">{count}</span> {count === 1 ? "vino" : "vini"}
+      </div>
     </div>
     <div className="flex items-center gap-3">
       <Select value={sort} onValueChange={setSort}>
@@ -106,15 +119,18 @@ export const WineBrowser = ({ eyebrow, title, description, fixed = {}, emptyTitl
   const detail = wines.find((w) => w.id === detailId) || null;
   const hasActive = KEYS.some((k) => filters[k]) || !!q;
   const reset = () => { setQ(""); clear(); };
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const activeCount = KEYS.filter((k) => filters[k]).length + (q ? 1 : 0);
 
   return (
     <Page>
       <PageHeader eyebrow={eyebrow} title={title} description={description} testid={testid}
         actions={<GoldButton onClick={() => setEditing({})} data-testid="add-wine-button"><Plus className="h-4 w-4" /> Nuovo vino</GoldButton>} />
-      <div className="mt-8">
-        <WineFilters q={q} setQ={setQ} filters={filters} setFilter={setFilter} facets={facets} hasActive={hasActive} onReset={reset} />
-      </div>
-      <BrowserToolbar count={wines.length} sort={sort} setSort={setSort} view={view} setView={setView} />
+      <BrowserToolbar count={wines.length} sort={sort} setSort={setSort} view={view} setView={setView}
+        activeCount={activeCount} onFilters={() => setFiltersOpen(true)} />
+      <ActiveFilters q={q} setQ={setQ} filters={filters} setFilter={setFilter} onReset={reset} />
+      <FilterPanel open={filtersOpen} setOpen={setFiltersOpen} q={q} setQ={setQ} filters={filters} setFilter={setFilter}
+        facets={facets} onReset={reset} count={wines.length} />
       <div className="mt-5">
         <WineResults isLoading={isLoading} wines={wines} view={view} hasActive={hasActive} showActions={!fixed.preferito}
           emptyTitle={emptyTitle} emptyText={emptyText} onAdd={() => setEditing({})} onOpen={(x) => setDetailId(x.id)} />

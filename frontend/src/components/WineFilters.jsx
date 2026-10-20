@@ -1,5 +1,7 @@
 import { Search, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { GoldButton, GhostButton } from "@/components/ui-kit";
 
 const ALL = "__all";
 
@@ -29,8 +31,67 @@ export const SORT_OPTIONS = [
   ["recenti", "Ultimi inseriti"],
 ];
 
-export const WineFilters = ({ q, setQ, filters, setFilter, facets = {}, hasActive, onReset }) => (
-  <div className="space-y-3">
+const LABELS = {
+  produttore: "Produttore", regione: "Regione", tipologia: "Tipologia",
+  denominazione: "Denominazione", annata: "Annata", fornitore: "Fornitore",
+};
+
+const Chip = ({ label, onRemove, testid }) => (
+  <span className="inline-flex items-center gap-2 border border-oro/50 bg-oro/10 px-3 py-1 text-xs text-bordeaux-800" data-testid={testid}>
+    {label}
+    <button onClick={onRemove} aria-label={`Rimuovi ${label}`} data-testid={`${testid}-remove`}><X className="h-3 w-3" /></button>
+  </span>
+);
+
+export const ActiveFilters = ({ q, setQ, filters, setFilter, onReset }) => {
+  const active = Object.keys(LABELS).filter((k) => filters[k]);
+  if (!q && active.length === 0) return null;
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-2" data-testid="active-filters">
+      {q && <Chip label={`«${q}»`} onRemove={() => setQ("")} testid="active-search-chip" />}
+      {active.map((k) => (
+        <Chip key={k} label={`${LABELS[k]}: ${filters[k]}`} onRemove={() => setFilter(k, "")} testid={`active-${k}-chip`} />
+      ))}
+      <button onClick={onReset} data-testid="reset-filters-button" className="text-xs uppercase tracking-[0.18em] text-bordeaux-600 underline-offset-4 hover:underline">
+        Azzera filtri
+      </button>
+    </div>
+  );
+};
+
+const FILTER_KEYS = ["produttore", "regione", "tipologia", "denominazione", "annata", "fornitore"];
+
+export const FilterPanel = ({ open, setOpen, q, setQ, filters, setFilter, facets = {}, onReset, count }) => (
+  <Sheet open={open} onOpenChange={setOpen}>
+    <SheetContent side="right" className="flex w-full flex-col gap-0 overflow-y-auto border-oro/40 bg-avorio-50 p-0 sm:max-w-md" data-testid="filter-panel">
+      <div className="flex-1 p-6 pt-8">
+        <div className="eyebrow">Ricerca</div>
+        <SheetTitle className="mt-1 font-serif text-3xl font-semibold text-bordeaux-900">Cerca e filtra</SheetTitle>
+        <SheetDescription className="mt-1 text-sm text-ink-muted">I risultati si aggiornano mentre scegli.</SheetDescription>
+        <div className="gold-rule my-6" />
+        <SearchField q={q} setQ={setQ} />
+        <div className="mt-5 space-y-4">
+          {FILTER_KEYS.map((k) => (
+            <label key={k} className="block">
+              <span className="eyebrow">{LABELS[k]}</span>
+              <div className="mt-1.5">
+                <FilterSelect label={LABELS[k]} value={filters[k]} onChange={(v) => setFilter(k, v)} options={facets[k] || []} testid={`filter-${k}-select`} />
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
+      <div className="sticky bottom-0 flex gap-3 border-t border-avorio-200 bg-avorio-50 p-4">
+        <GhostButton onClick={onReset} className="flex-1" data-testid="filter-panel-reset-button">Azzera</GhostButton>
+        <GoldButton onClick={() => setOpen(false)} className="flex-[2]" data-testid="filter-panel-apply-button">
+          Mostra {count} {count === 1 ? "vino" : "vini"}
+        </GoldButton>
+      </div>
+    </SheetContent>
+  </Sheet>
+);
+
+const SearchField = ({ q, setQ }) => (
     <div className="relative">
       <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-oro-dark" />
       <input
@@ -47,29 +108,4 @@ export const WineFilters = ({ q, setQ, filters, setFilter, facets = {}, hasActiv
         </button>
       )}
     </div>
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-      <FilterSelect label="Regione" value={filters.regione} onChange={(v) => setFilter("regione", v)} options={facets.regione || []} testid="filter-regione-select" />
-      <FilterSelect label="Tipologia" value={filters.tipologia} onChange={(v) => setFilter("tipologia", v)} options={facets.tipologia || []} testid="filter-tipologia-select" />
-      <FilterSelect label="Denominazione" value={filters.denominazione} onChange={(v) => setFilter("denominazione", v)} options={facets.denominazione || []} testid="filter-denominazione-select" />
-      <FilterSelect label="Annata" value={filters.annata} onChange={(v) => setFilter("annata", v)} options={facets.annata || []} testid="filter-annata-select" />
-      <div className="col-span-2 lg:col-span-1">
-        <FilterSelect label="Fornitore" value={filters.fornitore} onChange={(v) => setFilter("fornitore", v)} options={facets.fornitore || []} testid="filter-fornitore-select" />
-      </div>
-    </div>
-    {hasActive && (
-      <div className="flex flex-wrap items-center gap-2">
-        {filters.produttore && (
-          <span className="inline-flex items-center gap-2 border border-oro/50 bg-oro/10 px-3 py-1 text-xs text-bordeaux-800" data-testid="active-produttore-chip">
-            Produttore: {filters.produttore}
-            <button onClick={() => setFilter("produttore", "")} aria-label="Rimuovi filtro produttore" data-testid="remove-produttore-filter">
-              <X className="h-3 w-3" />
-            </button>
-          </span>
-        )}
-        <button onClick={onReset} data-testid="reset-filters-button" className="text-xs uppercase tracking-[0.18em] text-bordeaux-600 underline-offset-4 hover:underline">
-          Azzera filtri
-        </button>
-      </div>
-    )}
-  </div>
 );
