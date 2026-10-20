@@ -88,6 +88,10 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Casella "Esaurito" per vino: badge in galleria/elenco/dettaglio; nella carta digitale e stampata compare "Esaurito" al posto del prezzo; colonna Esaurito in export/import
 - Testing: 97/97 backend + UI OK (iteration_10); poi piccoli ritocchi (nome nell'header mobile, campo nome non sovrascritto durante la digitazione, prezzo barrato nella scheda pubblica se esaurito)
 
+## Implemented (2026-10-20, iterazione 15)
+- Visibilità campi: casella Esaurito e interruttore Visibile spostati sotto la foto in cima al modulo vino; campo Nome del ristorante anche in cima a "Carta per i clienti" (admin), oltre che in Account e utenti
+- Testing: frontend OK (iteration_11)
+
 ## Backlog
 - P1: snapshot automatico del catalogo prima di ogni ripristino backup
 - P1: TTL cleanup login_attempts; recupero password via email

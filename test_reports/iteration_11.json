@@ -1,0 +1,16 @@
+{
+  "summary": "Frontend-only retest of discoverability fix for (1) restaurant name setting and (2) Esaurito checkbox. All 4 requested scenarios PASS. Wine form: at 1920x800 the Esaurito checkbox (y=521) and Visibile switch (y=620) are inside the first viewport, right under the label photo; at 390x844 they are at y=506/606, above the Nome input (y=710), without scrolling. Creating TEST_ wine with Esaurito checked -> POST 201 esaurito=true, wine-soldout-badge-<id> visible on card, detail-soldout-badge visible, edit dialog reopens with checkbox data-state=checked. /carta (admin): carta-restaurant-section directly under the page header (y=256 desktop, input y=392 mobile); save updates carta-restaurant-name + brand-restaurant-name (desktop) and mobile-restaurant-name (390px header); toast 'Nome del ristorante salvato'. /account restaurant-card prefilled with the saved value, save works, clearing falls back to 'Ristorante'/'Selezione'. Staff user: carta-restaurant-section and restaurant-card both absent (count 0). No horizontal overflow at 390px (scrollWidth 390 on /carta, dialog 388/388).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "RestaurantForm useEffect only initialises once after load. If the name is saved in another tab, an already mounted form won't refresh. Acceptable, low priority."
+  ],
+  "updated_files": ["/app/test_reports/iteration_11.json"],
+  "success_rate": {"backend": "N/A (skipped as requested)", "frontend": "100%"},
+  "seed_data_creation": "Created TEST_Esaurito Desk wine and test_staff_it11@example.com staff user; both deleted. nome_ristorante reset to \"\". DB now holds only 'Amaranta' wine and the admin user (not touched).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 10 = backend 97/97. Iteration 11 = frontend discoverability fix verified at 1920 and 390. Real data: wine 'Amaranta' must not be modified. Keep nome_ristorante empty after tests."
+}
