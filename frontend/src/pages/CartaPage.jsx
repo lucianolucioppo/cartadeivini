@@ -36,7 +36,7 @@ const Toggle = ({ id, label, checked, onChange }) => (
 );
 
 const CartaItem = ({ w, showNotes }) => {
-  const meta = useMemo(() => [w.vitigno, w.gradazione].filter(Boolean).join(" · "), [w.vitigno, w.gradazione]);
+  const meta = useMemo(() => [w.vitigno, w.gradazione && `Grado alcolico ${w.gradazione}`].filter(Boolean).join(" · "), [w.vitigno, w.gradazione]);
   return (
   <li className="break-inside-avoid py-3" data-testid={`carta-item-${w.id}`}>
     <div className="font-display text-[11px] uppercase tracking-[0.18em] text-oro-dark" data-testid={`carta-item-produttore-${w.id}`}>{w.produttore}</div>

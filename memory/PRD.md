@@ -103,7 +103,7 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Carta digitale: contatore vini accanto a ogni pulsante (Tutti, Consigliati, tipologie), es. "Rosso (12)"; include anche i vini esauriti mostrati in carta
 
 ## Implemented (2026-10-20, iterazione 19)
-- Carta stampabile, layout per vino: riga 1 produttore; riga 2 nome (più grande) + annata, prezzo a destra; riga 3 vitigno · gradazione; riga 4 abbinamenti; riga 5 note (facoltativa). Tolti denominazione, formato e temperatura; righe vuote non stampate
+- Carta stampabile, layout per vino: riga 1 produttore; riga 2 nome (più grande) + annata, prezzo a destra; riga 3 vitigno · "Grado alcolico" + gradazione; riga 4 abbinamenti; riga 5 note (facoltativa). Tolti denominazione, formato e temperatura; righe vuote non stampate
 
 ## Backlog
 - P1: snapshot automatico del catalogo prima di ogni ripristino backup
