@@ -56,13 +56,17 @@ def create_refresh_token(user_id: str) -> str:
     return jwt.encode(payload, _secret(), algorithm=JWT_ALGORITHM)
 
 
-def decode_token(token: str, expected_type: str) -> dict:
+def _jwt_decode(token: str) -> dict:
     try:
-        payload = jwt.decode(token, _secret(), algorithms=[JWT_ALGORITHM])
+        return jwt.decode(token, _secret(), algorithms=[JWT_ALGORITHM])
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Sessione scaduta")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Token non valido")
+
+
+def decode_token(token: str, expected_type: str) -> dict:
+    payload = _jwt_decode(token)
     if payload.get("type") != expected_type:
         raise HTTPException(status_code=401, detail="Token non valido")
     return payload

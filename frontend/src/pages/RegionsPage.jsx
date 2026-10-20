@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { MapPinned } from "lucide-react";
 import { Page, PageHeader, EmptyState } from "@/components/ui-kit";
@@ -32,14 +33,16 @@ const TypesPanel = ({ tipologie, totale }) => (
   </section>
 );
 
-const RegionCard = ({ r, i }) => (
+const RegionCard = ({ r, i }) => {
+  const tipi = useMemo(() => Object.entries(r.tipologie).sort((a, b) => b[1] - a[1]), [r.tipologie]);
+  return (
   <div className="animate-rise border border-avorio-200 bg-white/60 p-5 transition-colors hover:border-oro" style={{ animationDelay: `${Math.min(i, 10) * 35}ms` }} data-testid={`region-card-${i}`}>
     <Link to={link({ regione: r.nome })} className="flex items-baseline justify-between gap-3" data-testid={`region-link-${i}`}>
       <h3 className="font-serif text-2xl font-semibold text-bordeaux-900 hover:text-bordeaux-600">{r.nome}</h3>
       <span className="font-display text-2xl text-oro-dark">{r.count}</span>
     </Link>
     <div className="mt-4 flex flex-wrap gap-2">
-      {Object.entries(r.tipologie).sort((a, b) => b[1] - a[1]).map(([t, n]) => (
+      {tipi.map(([t, n]) => (
         <Link key={t} to={link({ regione: r.nome, tipologia: t })}
           className="inline-flex items-center gap-1.5 border border-oro/40 px-2.5 py-1 text-xs text-ink transition-colors hover:bg-oro/15">
           <span className="h-2 w-2 rounded-full" style={{ background: tipoColor(t) }} />{t}<span className="text-ink-muted">· {n}</span>
@@ -47,7 +50,8 @@ const RegionCard = ({ r, i }) => (
       ))}
     </div>
   </div>
-);
+  );
+};
 
 export default function RegionsPage() {
   const { data, isLoading } = useStats("regioni-tipologie");

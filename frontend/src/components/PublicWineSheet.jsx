@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Star } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { LabelImage } from "@/components/LabelImage";
@@ -11,7 +12,12 @@ const Info = ({ label, value }) =>
     </div>
   ) : null;
 
-export const PublicWineSheet = ({ wine, onClose }) => (
+export const PublicWineSheet = ({ wine, onClose }) => {
+  const subtitle = useMemo(
+    () => (wine ? [wine.tipologia, wine.annata || "s.a.", wine.formato].filter(Boolean).join(" · ") : ""),
+    [wine]
+  );
+  return (
   <Sheet open={!!wine} onOpenChange={(o) => !o && onClose()}>
     <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto border-oro/40 bg-avorio-50 p-0 sm:mx-auto sm:max-w-2xl" data-testid="public-wine-sheet">
       {wine && (
@@ -26,7 +32,7 @@ export const PublicWineSheet = ({ wine, onClose }) => (
             <div className="eyebrow">{wine.produttore}</div>
             <SheetTitle className="mt-1 font-serif text-3xl font-semibold leading-tight text-bordeaux-900" data-testid="public-wine-name">{wine.nome}</SheetTitle>
             <SheetDescription className="mt-1 text-sm text-ink-muted">
-              {[wine.tipologia, wine.annata || "s.a.", wine.formato].filter(Boolean).join(" · ")}
+              {subtitle}
             </SheetDescription>
             <div className="mt-4 inline-block bg-bordeaux-950 px-4 py-2 font-display text-xl text-oro-light" data-testid="public-wine-price">{euro(wine.prezzo_carta)}</div>
             <div className="mt-4 grid grid-cols-2 gap-x-6">
@@ -43,4 +49,5 @@ export const PublicWineSheet = ({ wine, onClose }) => (
       )}
     </SheetContent>
   </Sheet>
-);
+  );
+};

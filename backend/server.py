@@ -372,15 +372,34 @@ async def public_photo(wine_id: str):
     w = await db.wines.find_one({"id": wine_id, "visibile": {"$ne": False}}, {"_id": 0, "foto_path": 1})
     if not w or not w.get("foto_path"):
         raise HTTPException(status_code=404, detail="Foto non disponibile")
-    try:
-        data, ctype = await get_object(w["foto_path"])
-    except Exception:
-        raise HTTPException(status_code=404, detail="Foto non disponibile")
+    data, ctype = await load_object(w["foto_path"], "Foto non disponibile")
     return Response(content=data, media_type=ctype, headers={"Cache-Control": "public, max-age=3600"})
 
 
 # ---------- photos ----------
 MAX_UPLOAD = 15 * 1024 * 1024
+
+
+async def load_object(path: str, detail: str) -> tuple[bytes, str]:
+    try:
+        return await get_object(path)
+    except Exception:
+        raise HTTPException(status_code=404, detail=detail)
+
+
+async def _compress_upload(raw: bytes) -> bytes:
+    try:
+        return await asyncio.to_thread(compress_image, raw)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Immagine non leggibile")
+
+
+async def _store_photo(path: str, data: bytes) -> dict:
+    try:
+        return await put_object(path, data, "image/jpeg")
+    except Exception as e:
+        logger.error(f"Upload failed: {e}")
+        raise HTTPException(status_code=502, detail="Caricamento della foto non riuscito, riprova")
 
 
 @api.post("/upload")
@@ -390,16 +409,9 @@ async def upload_photo(file: UploadFile = File(...), _: dict = Depends(get_curre
     raw = await file.read()
     if len(raw) > MAX_UPLOAD:
         raise HTTPException(status_code=400, detail="Immagine troppo grande (max 15 MB)")
-    try:
-        data = await asyncio.to_thread(compress_image, raw)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Immagine non leggibile")
+    data = await _compress_upload(raw)
     path = f"{APP_NAME}/etichette/{uuid.uuid4()}.jpg"
-    try:
-        result = await put_object(path, data, "image/jpeg")
-    except Exception as e:
-        logger.error(f"Upload failed: {e}")
-        raise HTTPException(status_code=502, detail="Caricamento della foto non riuscito, riprova")
+    result = await _store_photo(path, data)
     await db.files.insert_one({"id": str(uuid.uuid4()), "storage_path": result["path"], "content_type": "image/jpeg",
                                "original_filename": file.filename, "size": result.get("size", len(data)),
                                "is_deleted": False, "created_at": now_iso()})
@@ -411,10 +423,7 @@ async def get_file(path: str, _: dict = Depends(get_current_user)):
     record = await db.files.find_one({"storage_path": path}, {"_id": 0})
     if not record:
         raise HTTPException(status_code=404, detail="File non trovato")
-    try:
-        data, ctype = await get_object(path)
-    except Exception:
-        raise HTTPException(status_code=404, detail="File non disponibile")
+    data, ctype = await load_object(path, "File non disponibile")
     return Response(content=data, media_type=record.get("content_type") or ctype,
                     headers={"Cache-Control": "private, max-age=604800, immutable"})
 
@@ -615,20 +624,23 @@ async def backup(_: dict = Depends(get_current_user)):
 
 
 def _backup_wine(raw: dict) -> Wine:
-    try:
-        base = WineIn(**raw)
-    except Exception:
-        raise HTTPException(status_code=400, detail=f"Vino non valido nel backup: {raw.get('nome', '?')}")
     ts = now_iso()
-    return Wine(**base.model_dump(), id=raw.get("id") or str(uuid.uuid4()),
-                created_at=raw.get("created_at") or ts, updated_at=raw.get("updated_at") or ts)
+    try:
+        return Wine(**WineIn(**raw).model_dump(), id=raw.get("id") or str(uuid.uuid4()),
+                    created_at=raw.get("created_at") or ts, updated_at=raw.get("updated_at") or ts)
+    except ValidationError:
+        raise HTTPException(status_code=400, detail=f"Vino non valido nel backup: {raw.get('nome', '?')}")
+
+
+def _load_json(raw: bytes):
+    try:
+        return json.loads(raw)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="File di backup non valido")
 
 
 def _parse_backup(raw: bytes) -> tuple[list[Wine], dict]:
-    try:
-        payload = json.loads(raw)
-    except Exception:
-        raise HTTPException(status_code=400, detail="File di backup non valido")
+    payload = _load_json(raw)
     if not isinstance(payload, dict) or payload.get("app") != "carta-dei-vini" or not isinstance(payload.get("wines"), list):
         raise HTTPException(status_code=400, detail="Il file non è un backup di Carta dei Vini")
     photos = {p: i for p, i in (payload.get("photos") or {}).items() if p.startswith(f"{APP_NAME}/")}

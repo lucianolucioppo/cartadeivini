@@ -16,7 +16,9 @@ const Chip = ({ active, onClick, children, testid }) => (
   </button>
 );
 
-const Row = ({ w, onOpen }) => (
+const Row = ({ w, onOpen }) => {
+  const meta = useMemo(() => [w.denominazione || w.regione, w.annata].filter(Boolean).join(" · "), [w.denominazione, w.regione, w.annata]);
+  return (
   <li>
     <button onClick={() => onOpen(w)} data-testid={`public-wine-${w.id}`}
       className="grid w-full grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-4 py-3.5 text-left transition-colors hover:bg-oro/10">
@@ -27,12 +29,13 @@ const Row = ({ w, onOpen }) => (
           <span className="truncate font-serif text-lg font-semibold leading-tight text-bordeaux-900">{w.nome}</span>
         </div>
         <div className="truncate text-xs text-ink-muted">{w.produttore}</div>
-        <div className="truncate text-xs text-ink-muted">{[w.denominazione || w.regione, w.annata].filter(Boolean).join(" · ")}</div>
+        <div className="truncate text-xs text-ink-muted">{meta}</div>
       </div>
       <span className="font-display text-base text-bordeaux-800">{euro(w.prezzo_carta)}</span>
     </button>
   </li>
-);
+  );
+};
 
 const SEARCH_FIELDS = ["nome", "produttore", "denominazione", "regione", "vitigno"];
 
@@ -58,20 +61,43 @@ const useFiltered = (wines, q, tipo) =>
     return groupByTipologia((wines || []).filter((w) => matchesTipo(w, tipo) && matchesTerm(w, term)));
   }, [wines, q, tipo]);
 
-export default function PublicCartaPage() {
+function usePublicCarta() {
   const [wines, setWines] = useState(null);
   const [error, setError] = useState("");
-  const [q, setQ] = useState("");
-  const [tipo, setTipo] = useState("");
-  const [open, setOpen] = useState(null);
-  const groups = useFiltered(wines, q, tipo);
-  const tipi = useMemo(() => [...new Set((wines || []).map((w) => w.tipologia || OTHER))].sort((a, b) => tipoOrder(a) - tipoOrder(b)), [wines]);
-  const hasFav = (wines || []).some((w) => w.preferito);
-
   useEffect(() => {
     document.title = "Carta dei Vini";
     axios.get(`${API}/public/carta`).then((r) => setWines(r.data)).catch((e) => setError(formatApiError(e)));
   }, []);
+  const tipi = useMemo(() => [...new Set((wines || []).map((w) => w.tipologia || OTHER))].sort((a, b) => tipoOrder(a) - tipoOrder(b)), [wines]);
+  const hasFav = useMemo(() => (wines || []).some((w) => w.preferito), [wines]);
+  return { wines, error, tipi, hasFav };
+}
+
+const FilterBar = ({ q, setQ, tipo, setTipo, tipi, hasFav }) => (
+  <div className="sticky top-0 z-10 -mx-5 space-y-3 border-b border-avorio-200 bg-avorio-50/95 px-5 py-4 backdrop-blur-xl">
+    <div className="relative">
+      <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-oro-dark" />
+      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca vino, cantina, vitigno…" className="field h-12 pl-10 pr-10 text-base" data-testid="public-search-input" />
+      {q && <button onClick={() => setQ("")} aria-label="Cancella" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted"><X className="h-4 w-4" /></button>}
+    </div>
+    <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+      <Chip active={!tipo} onClick={() => setTipo("")} testid="public-chip-all">Tutti</Chip>
+      {hasFav && <Chip active={tipo === FAV} onClick={() => setTipo(FAV)} testid="public-chip-consigliati"><Star className="h-3 w-3" /> Consigliati</Chip>}
+      {tipi.map((t) => (
+        <Chip key={t} active={tipo === t} onClick={() => setTipo(t)} testid={`public-chip-${t}`}>
+          <span className="h-2 w-2 rounded-full" style={{ background: tipoColor(t) }} />{t}
+        </Chip>
+      ))}
+    </div>
+  </div>
+);
+
+export default function PublicCartaPage() {
+  const { wines, error, tipi, hasFav } = usePublicCarta();
+  const [q, setQ] = useState("");
+  const [tipo, setTipo] = useState("");
+  const [open, setOpen] = useState(null);
+  const groups = useFiltered(wines, q, tipo);
 
   return (
     <div className="min-h-screen bg-avorio-50" data-testid="public-carta-page">
@@ -85,22 +111,7 @@ export default function PublicCartaPage() {
         {!error && !wines && <p className="mt-16 text-center font-serif text-xl italic text-ink-muted">Caricamento della carta…</p>}
         {wines && (
           <>
-            <div className="sticky top-0 z-10 -mx-5 space-y-3 border-b border-avorio-200 bg-avorio-50/95 px-5 py-4 backdrop-blur-xl">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-oro-dark" />
-                <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca vino, cantina, vitigno…" className="field h-12 pl-10 pr-10 text-base" data-testid="public-search-input" />
-                {q && <button onClick={() => setQ("")} aria-label="Cancella" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted"><X className="h-4 w-4" /></button>}
-              </div>
-              <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
-                <Chip active={!tipo} onClick={() => setTipo("")} testid="public-chip-all">Tutti</Chip>
-                {hasFav && <Chip active={tipo === FAV} onClick={() => setTipo(FAV)} testid="public-chip-consigliati"><Star className="h-3 w-3" /> Consigliati</Chip>}
-                {tipi.map((t) => (
-                  <Chip key={t} active={tipo === t} onClick={() => setTipo(t)} testid={`public-chip-${t}`}>
-                    <span className="h-2 w-2 rounded-full" style={{ background: tipoColor(t) }} />{t}
-                  </Chip>
-                ))}
-              </div>
-            </div>
+            <FilterBar q={q} setQ={setQ} tipo={tipo} setTipo={setTipo} tipi={tipi} hasFav={hasFav} />
             {groups.length === 0 && (
               <div className="mt-16 flex flex-col items-center text-center text-ink-muted" data-testid="public-empty">
                 <Wine className="h-10 w-10 text-oro" strokeWidth={1} />

@@ -41,6 +41,39 @@ const Row = ({ r }) => (
   </li>
 );
 
+const confirmLabel = (count) => (count === 0 ? "Niente da importare" : `Importa ${count} ${count === 1 ? "vino" : "vini"}`);
+
+const ModeChoice = ({ mode, setMode }) => (
+  <RadioGroup value={mode} onValueChange={setMode} className="mt-5 space-y-2 border border-avorio-200 bg-white/60 p-4" data-testid="import-mode-radio">
+    <div className="eyebrow">Vini già presenti in carta (stesso nome, produttore e annata)</div>
+    <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="skip" data-testid="import-mode-skip" /> Lasciali come sono</label>
+    <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="update" data-testid="import-mode-update" /> Aggiornali con i dati del file (foto e altri campi restano invariati)</label>
+  </RadioGroup>
+);
+
+const ImportFooter = ({ busy, count, onClose, onSubmit }) => (
+  <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+    <GhostButton onClick={onClose} disabled={busy} data-testid="import-cancel-button">Annulla</GhostButton>
+    <GoldButton onClick={onSubmit} disabled={busy || count === 0} data-testid="import-confirm-button">
+      {busy && <Loader2 className="h-4 w-4 animate-spin" />} {confirmLabel(count)}
+    </GoldButton>
+  </div>
+);
+
+const Summary = ({ preview }) => (
+  <>
+    <div className="mt-4 grid grid-cols-3 gap-px bg-oro/30">
+      <Stat label="Nuovi" value={preview.totali.nuovi} testid="import-count-nuovi" />
+      <Stat label="Già presenti" value={preview.totali.presenti} testid="import-count-presenti" />
+      <Stat label="Con errori" value={preview.totali.errori} testid="import-count-errori" />
+    </div>
+    <div className="mt-5 space-y-2">
+      <Chips label="Colonne riconosciute" items={Object.values(preview.columns)} />
+      <Chips label="Ignorate" items={preview.ignored} muted />
+    </div>
+  </>
+);
+
 export const ImportPreviewDialog = ({ preview, fileName, onClose, onConfirm }) => {
   const [mode, setMode] = useState("skip");
   const [busy, setBusy] = useState(false);
@@ -65,32 +98,13 @@ export const ImportPreviewDialog = ({ preview, fileName, onClose, onConfirm }) =
         <div className="eyebrow">Anteprima importazione</div>
         <DialogTitle className="font-serif text-3xl font-semibold text-bordeaux-900">{fileName}</DialogTitle>
         <DialogDescription className="text-sm text-ink-muted">Controlla le righe lette dal file prima di confermare.</DialogDescription>
-        <div className="mt-4 grid grid-cols-3 gap-px bg-oro/30">
-          <Stat label="Nuovi" value={t.nuovi} testid="import-count-nuovi" />
-          <Stat label="Già presenti" value={t.presenti} testid="import-count-presenti" />
-          <Stat label="Con errori" value={t.errori} testid="import-count-errori" />
-        </div>
-        <div className="mt-5 space-y-2">
-          <Chips label="Colonne riconosciute" items={Object.values(preview.columns)} />
-          <Chips label="Ignorate" items={preview.ignored} muted />
-        </div>
-        {t.presenti > 0 && (
-          <RadioGroup value={mode} onValueChange={setMode} className="mt-5 space-y-2 border border-avorio-200 bg-white/60 p-4" data-testid="import-mode-radio">
-            <div className="eyebrow">Vini già presenti in carta (stesso nome, produttore e annata)</div>
-            <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="skip" data-testid="import-mode-skip" /> Lasciali come sono</label>
-            <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="update" data-testid="import-mode-update" /> Aggiornali con i dati del file (foto e altri campi restano invariati)</label>
-          </RadioGroup>
-        )}
+        <Summary preview={preview} />
+        {t.presenti > 0 && <ModeChoice mode={mode} setMode={setMode} />}
         <ul className="mt-5 max-h-[38vh] divide-y divide-avorio-200 overflow-y-auto border-y border-avorio-200" data-testid="import-rows-list">
           {preview.rows.map((r) => <Row key={r.riga} r={r} />)}
         </ul>
         {t.righe > preview.rows.length && <p className="mt-2 text-xs text-ink-muted">Mostrate le prime {preview.rows.length} righe su {t.righe}.</p>}
-        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <GhostButton onClick={onClose} disabled={busy} data-testid="import-cancel-button">Annulla</GhostButton>
-          <GoldButton onClick={submit} disabled={busy || count === 0} data-testid="import-confirm-button">
-            {busy && <Loader2 className="h-4 w-4 animate-spin" />} {count === 0 ? "Niente da importare" : `Importa ${count} ${count === 1 ? "vino" : "vini"}`}
-          </GoldButton>
-        </div>
+        <ImportFooter busy={busy} count={count} onClose={onClose} onSubmit={submit} />
       </DialogContent>
     </Dialog>
   );

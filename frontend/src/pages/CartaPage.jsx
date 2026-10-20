@@ -33,7 +33,10 @@ const Toggle = ({ id, label, checked, onChange }) => (
   </label>
 );
 
-const CartaItem = ({ w, showNotes }) => (
+const CartaItem = ({ w, showNotes }) => {
+  const meta = useMemo(() => [w.produttore, w.denominazione, w.vitigno, w.formato, w.gradazione,
+    w.temperatura_servizio && `servire a ${w.temperatura_servizio}`].filter(Boolean).join(" · "), [w]);
+  return (
   <li className="break-inside-avoid py-2.5" data-testid={`carta-item-${w.id}`}>
     <div className="flex items-baseline gap-2">
       <span className="font-serif text-lg font-semibold text-bordeaux-900">{w.nome}</span>
@@ -41,13 +44,11 @@ const CartaItem = ({ w, showNotes }) => (
       <span className="mx-1 flex-1 translate-y-[-3px] border-b border-dotted border-oro/60" />
       <span className="font-display text-base text-bordeaux-800">{price(w.prezzo_carta)}</span>
     </div>
-    <div className="text-xs text-ink-muted">
-      {[w.produttore, w.denominazione, w.vitigno, w.formato, w.gradazione,
-        w.temperatura_servizio && `servire a ${w.temperatura_servizio}`].filter(Boolean).join(" · ")}
-    </div>
+    <div className="text-xs text-ink-muted">{meta}</div>
     {showNotes && w.note && <p className="mt-1 font-serif text-sm italic text-ink-muted">{w.note}</p>}
   </li>
-);
+  );
+};
 
 export default function CartaPage() {
   const [onlyFav, setOnlyFav] = useState(false);
