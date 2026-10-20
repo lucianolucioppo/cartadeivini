@@ -96,6 +96,9 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 - Campo `abbinamenti` (testo libero, max 1000): modulo vino sotto le Note, dettaglio staff, carta stampabile e carta digitale (nascosto ai clienti se vuoto), export/import (colonna "Abbinamenti"), backup; escluso dalla ricerca testuale
 - Testing: 112/112 backend + UI OK, mobile 390px OK (iteration_12)
 
+## Implemented (2026-10-20, iterazione 17)
+- Carta digitale mobile: i pulsanti delle tipologie vanno a capo su più righe invece di scorrere di lato, così si vedono tutti (verificato a 390px)
+
 ## Backlog
 - P1: snapshot automatico del catalogo prima di ogni ripristino backup
 - P1: TTL cleanup login_attempts; recupero password via email

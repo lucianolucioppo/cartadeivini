@@ -86,7 +86,7 @@ const FilterBar = ({ q, setQ, tipo, setTipo, tipi, hasFav }) => (
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca vino, cantina, vitigno…" className="field h-12 pl-10 pr-10 text-base" data-testid="public-search-input" />
       {q && <button onClick={() => setQ("")} aria-label="Cancella" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted"><X className="h-4 w-4" /></button>}
     </div>
-    <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+    <div className="flex flex-wrap gap-2" data-testid="public-tipo-chips">
       <Chip active={!tipo} onClick={() => setTipo("")} testid="public-chip-all">Tutti</Chip>
       {hasFav && <Chip active={tipo === FAV} onClick={() => setTipo(FAV)} testid="public-chip-consigliati"><Star className="h-3 w-3" /> Consigliati</Chip>}
       {tipi.map((t) => (
