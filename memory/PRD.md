@@ -79,6 +79,10 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 ## Implemented (2026-10-20, iterazione 12)
 - Filtro "Fornitore" in Tutti i vini e Preferiti (parametro `fornitore` su GET /api/wines, valori da facets), salvato nell'URL, azzerabile
 
+## Implemented (2026-10-20, iterazione 13)
+- Pagina Tutti i vini (e Preferiti) semplificata: pulsante "Cerca e filtra" con badge che apre un pannello laterale (ricerca + filtri produttore, regione, tipologia, denominazione, annata, fornitore; risultati live, "Mostra N vini", "Azzera"); filtri attivi come chip rimovibili
+- Testing: frontend OK su 390px e desktop (iteration_9)
+
 ## Backlog
 - P1: snapshot automatico del catalogo prima di ogni ripristino backup
 - P1: TTL cleanup login_attempts; recupero password via email

@@ -1,0 +1,26 @@
+{
+  "summary": "Frontend only, iteration 9: tested the new 'Cerca e filtra' side panel on /vini and /preferiti at 390x844 and 1920x800, plus links from Produttori and Regioni into filtered wines. Everything requested passes. No inline search or filters on the page. open-filters-button opens filter-panel. Typing 'TEST_' updated the apply button live (3 -> 2), and tipologia=Bianco brought it to 1 and wrote ?tipologia=Bianco to the URL. Apply, Escape and the X button (sheet-close-button) all close the panel. The badge showed 2, then 1 after a chip was removed. The search chip and tipologia chip each remove only their own filter. reset-filters-button and filter-panel-reset-button clear everything, including the search input. Opening /vini?tipologia=Rosso shows 2 wines with the chip already there. A producer card opens /vini?produttore=Tenuta%20Ulisse with active-produttore-chip, and removing the chip brings back all 3 wines. region-link-0 opens ?regione=Abruzzo and type-link-0 opens ?tipologia=Rosso, both with chips. Preferiti uses the same toolbar and panel, and an empty search there shows 'Nessun vino corrisponde alla ricerca'. At 390px the page is 390px wide, so no horizontal overflow, with or without chips.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/vini at 390px", "issues": ["The toolbar wraps to 2 rows (filter button and count; sort and view toggle), and 'Azzera filtri' drops to its own line under the chips. Acceptable, just noted."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/seed_iter9.py"],
+  "action_items": [
+    "Optional: the search text q is kept in component state only, not in the URL. It is lost on reload and back navigation, unlike the select filters. Consider syncing ?q= to the URL for consistency."
+  ],
+  "critical_code_review_comments": [
+    "WineFilters.jsx: SearchField is declared after FilterPanel, which uses it. This works because it is only referenced at render time, but it reads oddly. Its indentation is also inconsistent.",
+    "useUrlFilters.clear() drops all URL params, so any non-filter params would be lost too. Fine for now."
+  ],
+  "updated_files": ["/app/backend/tests/seed_iter9.py"],
+  "success_rate": {"backend": "skipped", "frontend": "100%"},
+  "seed_data_creation": "Created TEST_Bianco9 (Bianco, Sicilia, preferito) and TEST_Rosso9 (Rosso, Piemonte) under TEST_Cantina9, then deleted both. Final DB: only Amaranta (real data, untouched, preferito false).",
+  "test_credentials": "admin@cartadeivini.it from /app/memory/test_credentials.md",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Use `python /app/backend/tests/seed_iter9.py seed|clean` (needs REACT_APP_BACKEND_URL in the environment) to create and remove TEST_ wines. Never touch Amaranta."
+}
