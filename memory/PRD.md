@@ -76,6 +76,9 @@ Schede vino complete, galleria + elenco, ricerca, 4 filtri, CRUD, sezioni Tutti 
 ## Implemented (2026-10-20, iterazione 11)
 - Campo interno `fornitore` accanto al prezzo di acquisto: modulo (con suggerimenti), dettaglio, export/import (colonna "Fornitore"), backup; mai mostrato nella carta pubblica o stampata
 
+## Implemented (2026-10-20, iterazione 12)
+- Filtro "Fornitore" in Tutti i vini e Preferiti (parametro `fornitore` su GET /api/wines, valori da facets), salvato nell'URL, azzerabile
+
 ## Backlog
 - P1: snapshot automatico del catalogo prima di ogni ripristino backup
 - P1: TTL cleanup login_attempts; recupero password via email

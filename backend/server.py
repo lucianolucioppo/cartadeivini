@@ -210,13 +210,13 @@ SORTS = {"nome": [("nome", 1)], "produttore": [("produttore", 1), ("nome", 1)],
          "prezzo_desc": [("prezzo_carta", -1), ("nome", 1)], "recenti": [("created_at", -1)]}
 
 
-def wine_filter(q, regione, tipologia, denominazione, annata, produttore, preferito) -> dict:
+def wine_filter(q, regione, tipologia, denominazione, annata, produttore, preferito, fornitore=None) -> dict:
     flt = {}
     if q:
         rx = {"$regex": re.escape(q.strip()), "$options": "i"}
         flt["$or"] = [{"nome": rx}, {"produttore": rx}]
     for key, val in (("regione", regione), ("tipologia", tipologia), ("denominazione", denominazione),
-                     ("annata", annata), ("produttore", produttore)):
+                     ("annata", annata), ("produttore", produttore), ("fornitore", fornitore)):
         if val:
             flt[key] = val
     if preferito is not None:
@@ -232,9 +232,10 @@ async def fetch_wines(flt: dict, sort: str = "nome") -> list[dict]:
 @api.get("/wines")
 async def list_wines(q: Optional[str] = None, regione: Optional[str] = None, tipologia: Optional[str] = None,
                      denominazione: Optional[str] = None, annata: Optional[str] = None,
-                     produttore: Optional[str] = None, preferito: Optional[bool] = None, sort: str = "nome",
+                     produttore: Optional[str] = None, preferito: Optional[bool] = None, fornitore: Optional[str] = None,
+                     sort: str = "nome",
                      _: dict = Depends(get_current_user)):
-    return await fetch_wines(wine_filter(q, regione, tipologia, denominazione, annata, produttore, preferito), sort)
+    return await fetch_wines(wine_filter(q, regione, tipologia, denominazione, annata, produttore, preferito, fornitore), sort)
 
 
 @api.get("/wines/facets")

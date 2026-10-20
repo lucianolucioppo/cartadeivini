@@ -10,7 +10,7 @@ import { WineFormDialog } from "@/components/WineFormDialog";
 import { Page, PageHeader, EmptyState, GoldButton, GhostButton } from "@/components/ui-kit";
 import { useWines, useFacets } from "@/lib/queries";
 
-const KEYS = ["regione", "tipologia", "denominazione", "annata", "produttore"];
+const KEYS = ["regione", "tipologia", "denominazione", "annata", "produttore", "fornitore"];
 
 function useDebounced(value, ms) {
   const [v, setV] = useState(value);
