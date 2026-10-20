@@ -41,7 +41,7 @@ const renderFields = (fields, form, set) =>
   ));
 
 const SoldOutCheck = ({ form, set }) => (
-  <label className={`flex cursor-pointer items-center gap-3 border px-4 py-3 sm:col-span-2 ${form.esaurito ? "border-bordeaux-600 bg-bordeaux-600/5" : "border-avorio-300 bg-white/60"}`}>
+  <label className={`flex cursor-pointer items-center gap-3 border px-4 py-3 ${form.esaurito ? "border-bordeaux-600 bg-bordeaux-600/5" : "border-avorio-300 bg-white/60"}`}>
     <Checkbox checked={form.esaurito} onCheckedChange={(v) => set("esaurito", v === true)} data-testid="wine-form-esaurito-checkbox"
       className="h-5 w-5 border-bordeaux-700 data-[state=checked]:bg-bordeaux-700 data-[state=checked]:text-oro-light" />
     <div>
@@ -52,12 +52,19 @@ const SoldOutCheck = ({ form, set }) => (
 );
 
 const VisibleToggle = ({ form, set }) => (
-  <div className="flex items-center justify-between gap-4 border border-avorio-300 bg-white/60 px-4 py-3 sm:col-span-2">
+  <div className="flex items-center justify-between gap-4 border border-avorio-300 bg-white/60 px-4 py-3">
     <div>
       <div className="eyebrow">Carta digitale</div>
       <div className="text-sm text-ink">Visibile ai clienti nella carta digitale</div>
     </div>
     <Switch checked={form.visibile} onCheckedChange={(v) => set("visibile", v)} data-testid="wine-form-visibile-switch" />
+  </div>
+);
+
+export const StatusToggles = ({ form, set }) => (
+  <div className="space-y-3" data-testid="wine-status-toggles">
+    <SoldOutCheck form={form} set={set} />
+    <VisibleToggle form={form} set={set} />
   </div>
 );
 
@@ -70,8 +77,6 @@ export const WineFormFields = ({ form, set }) => (
       <span className="mt-1 block text-right text-[11px] text-ink-muted" data-testid="affinamento-char-count">{form.affinamento.length}/500</span>
     </Field>
     {renderFields(DETAIL_FIELDS, form, set)}
-    <SoldOutCheck form={form} set={set} />
-    <VisibleToggle form={form} set={set} />
     <Field label="Note descrittive" className="sm:col-span-2">
       <textarea value={form.note} onChange={(e) => set("note", e.target.value)} rows={5} data-testid="wine-form-note-input"
         className="field h-auto py-2.5 leading-relaxed" placeholder="Profumi, gusto, abbinamenti, temperatura di servizio…" />

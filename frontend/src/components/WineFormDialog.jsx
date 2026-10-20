@@ -1,7 +1,7 @@
 import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PhotoField } from "@/components/PhotoField";
-import { WineFormFields, WineFormSuggestions } from "@/components/WineFormFields";
+import { WineFormFields, WineFormSuggestions, StatusToggles } from "@/components/WineFormFields";
 import { GoldButton, GhostButton } from "@/components/ui-kit";
 import { useFacets } from "@/lib/queries";
 import { useWineForm } from "@/hooks/useWineForm";
@@ -23,6 +23,7 @@ export const WineFormDialog = ({ open, wine, onClose, onSaved }) => {
           <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)]">
             <div className="mx-auto w-full max-w-[220px]">
               <PhotoField value={form.foto_path} onChange={(v) => set("foto_path", v)} />
+              <div className="mt-4"><StatusToggles form={form} set={set} /></div>
             </div>
             <WineFormFields form={form} set={set} />
           </div>

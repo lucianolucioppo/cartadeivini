@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Trash2, UserPlus, KeyRound, Store } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,44 +9,7 @@ import {
 import { Page, PageHeader, GoldButton } from "@/components/ui-kit";
 import { api, formatApiError } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
-import { useSettings } from "@/lib/queries";
-
-const RestaurantForm = () => {
-  const qc = useQueryClient();
-  const { data: settings, isLoading } = useSettings();
-  const [nome, setNome] = useState("");
-  const [busy, setBusy] = useState(false);
-  const loaded = !isLoading;
-
-  useEffect(() => {
-    if (loaded) setNome(settings?.nome_ristorante || "");
-  }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps -- initialise once after load, don't overwrite typing
-
-  const submit = async (e) => {
-    e.preventDefault();
-    setBusy(true);
-    try {
-      await api.put("/settings", { nome_ristorante: nome });
-      qc.invalidateQueries({ queryKey: ["settings"] });
-      toast.success("Nome del ristorante salvato");
-    } catch (err) {
-      toast.error(formatApiError(err));
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <form onSubmit={submit} className="space-y-4">
-      <Labeled label="Nome del ristorante">
-        <input className="field" maxLength={120} value={nome} onChange={(e) => setNome(e.target.value)} disabled={!loaded}
-          placeholder="es. Trattoria da Mario" data-testid="restaurant-name-input" />
-      </Labeled>
-      <p className="text-xs text-ink-muted">Compare nel menu laterale, nella carta stampabile e nella carta digitale per i clienti.</p>
-      <GoldButton type="submit" disabled={busy} data-testid="save-restaurant-name-button">Salva</GoldButton>
-    </form>
-  );
-};
+import { RestaurantForm } from "@/components/RestaurantForm";
 
 const Card = ({ title, icon: Icon, children, testid }) => (
   <section className="border border-avorio-200 bg-white/60 p-6 md:p-8" data-testid={testid}>

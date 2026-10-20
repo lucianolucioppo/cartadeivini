@@ -3,6 +3,8 @@ import { Printer } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Page, PageHeader, GoldButton } from "@/components/ui-kit";
 import { DigitalCartaPanel } from "@/components/DigitalCartaPanel";
+import { RestaurantForm } from "@/components/RestaurantForm";
+import { useAuth } from "@/context/AuthContext";
 import { useWines, useSettings } from "@/lib/queries";
 import { TIPOLOGIE } from "@/lib/constants";
 
@@ -56,6 +58,7 @@ export default function CartaPage() {
   const { data: wines = [] } = useWines({ sort: "produttore", ...(onlyFav ? { preferito: true } : {}) });
   const groups = useMemo(() => groupWines(wines), [wines]);
   const { data: settings } = useSettings();
+  const { user } = useAuth();
 
   return (
     <Page className="print:max-w-none print:p-0">
@@ -63,6 +66,11 @@ export default function CartaPage() {
         <PageHeader eyebrow="Per gli ospiti" title="Carta per i clienti" testid="carta-page"
           description="Carta digitale con QR code per i tavoli e versione da stampare. Mai i prezzi di acquisto."
           actions={<GoldButton onClick={() => window.print()} data-testid="print-carta-button"><Printer className="h-4 w-4" /> Stampa</GoldButton>} />
+        {user?.role === "admin" && (
+          <section className="mt-8 border border-oro/50 bg-white/60 p-6 md:p-8" data-testid="carta-restaurant-section">
+            <RestaurantForm />
+          </section>
+        )}
         <DigitalCartaPanel />
         <div className="eyebrow mt-10">Carta stampabile</div>
         <div className="mt-3 flex flex-wrap gap-6">
