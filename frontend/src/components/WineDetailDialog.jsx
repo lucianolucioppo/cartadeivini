@@ -116,6 +116,12 @@ export const WineDetailDialog = ({ wine, onClose, onEdit }) => {
                 {wine.note || "Nessuna nota."}
               </p>
             </div>
+            <div className="mt-6">
+              <div className="eyebrow">Abbinamenti</div>
+              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink" data-testid="detail-abbinamenti">
+                {wine.abbinamenti || "Nessun abbinamento indicato."}
+              </p>
+            </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <GoldButton onClick={() => onEdit(wine)} data-testid="wine-edit-button"><Pencil className="h-4 w-4" /> Modifica</GoldButton>
               <GhostButton onClick={() => setConfirmOpen(true)} data-testid="wine-delete-button"><Trash2 className="h-4 w-4" /> Elimina</GhostButton>

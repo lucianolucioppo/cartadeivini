@@ -48,6 +48,7 @@ const CartaItem = ({ w, showNotes }) => {
     </div>
     <div className="text-xs text-ink-muted">{meta}</div>
     {showNotes && w.note && <p className="mt-1 font-serif text-sm italic text-ink-muted">{w.note}</p>}
+    {w.abbinamenti && <p className="mt-0.5 text-xs text-ink-muted" data-testid={`carta-item-abbinamenti-${w.id}`}><span className="text-oro-dark">Abbinamenti:</span> {w.abbinamenti}</p>}
   </li>
   );
 };

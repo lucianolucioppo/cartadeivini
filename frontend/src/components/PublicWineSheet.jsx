@@ -45,6 +45,12 @@ export const PublicWineSheet = ({ wine, onClose }) => {
             </div>
             {wine.affinamento && <div className="mt-2"><Info label="Affinamento" value={wine.affinamento} /></div>}
             {wine.note && <p className="mt-5 whitespace-pre-line font-serif text-lg italic leading-relaxed text-ink">{wine.note}</p>}
+            {wine.abbinamenti && (
+              <div className="mt-5 border-l-2 border-oro pl-4" data-testid="public-wine-abbinamenti">
+                <div className="eyebrow">Abbinamenti consigliati</div>
+                <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-ink">{wine.abbinamenti}</p>
+              </div>
+            )}
           </div>
         </>
       )}

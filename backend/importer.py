@@ -21,6 +21,7 @@ SYNONYMS = {
     "temperatura_servizio": ["temperatura di servizio", "temperatura servizio", "temperatura", "servizio",
                              "temp servizio"],
     "fornitore": ["fornitore", "distributore", "grossista", "supplier"],
+    "abbinamenti": ["abbinamenti", "abbinamento", "abbinamenti consigliati", "abbinamento cibo", "pairing", "food pairing"],
     "prezzo_acquisto": ["prezzo di acquisto", "prezzo acquisto", "acquisto", "costo", "prezzo costo",
                         "prezzo di acquisto (€)", "costo bottiglia"],
     "prezzo_carta": ["prezzo in carta", "prezzo carta", "prezzo in carta (€)", "prezzo", "prezzo vendita",

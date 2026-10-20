@@ -82,12 +82,13 @@ class WineIn(BaseModel):
     prezzo_carta: Optional[float] = Field(None, ge=0)
     foto_path: Optional[str] = None
     note: str = Field("", max_length=5000)
+    abbinamenti: str = Field("", max_length=1000)
     preferito: bool = False
     visibile: bool = True
     esaurito: bool = False
 
     @field_validator("nome", "produttore", "regione", "denominazione", "tipologia", "affinamento", "vitigno", "annata",
-                     "formato", "gradazione", "temperatura_servizio", "fornitore", "note", mode="before")
+                     "formato", "gradazione", "temperatura_servizio", "fornitore", "note", "abbinamenti", mode="before")
     @classmethod
     def strip(cls, v):
         return (v or "").strip() if isinstance(v, str) or v is None else str(v).strip()
@@ -366,7 +367,7 @@ async def update_settings(body: SettingsIn, _: dict = Depends(require_admin)):
 
 
 PUBLIC_FIELDS = ["id", "nome", "produttore", "regione", "denominazione", "tipologia", "affinamento", "vitigno",
-                 "annata", "formato", "gradazione", "temperatura_servizio", "prezzo_carta", "note", "preferito", "esaurito"]
+                 "annata", "formato", "gradazione", "temperatura_servizio", "prezzo_carta", "note", "abbinamenti", "preferito", "esaurito"]
 
 
 async def _require_public():
@@ -451,7 +452,7 @@ COLUMNS = [("nome", "Nome"), ("produttore", "Produttore / Cantina"), ("regione",
            ("temperatura_servizio", "Temperatura di servizio"), ("fornitore", "Fornitore"),
            ("prezzo_acquisto", "Prezzo di acquisto (€)"),
            ("prezzo_carta", "Prezzo in carta (€)"), ("preferito", "Preferito"),
-           ("visibile", "Visibile in carta digitale"), ("esaurito", "Esaurito"), ("note", "Note")]
+           ("visibile", "Visibile in carta digitale"), ("esaurito", "Esaurito"), ("note", "Note"), ("abbinamenti", "Abbinamenti")]
 
 
 def _stamp() -> str:

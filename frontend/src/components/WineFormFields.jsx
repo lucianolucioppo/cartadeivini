@@ -79,7 +79,11 @@ export const WineFormFields = ({ form, set }) => (
     {renderFields(DETAIL_FIELDS, form, set)}
     <Field label="Note descrittive" className="sm:col-span-2">
       <textarea value={form.note} onChange={(e) => set("note", e.target.value)} rows={5} data-testid="wine-form-note-input"
-        className="field h-auto py-2.5 leading-relaxed" placeholder="Profumi, gusto, abbinamenti, temperatura di servizio…" />
+        className="field h-auto py-2.5 leading-relaxed" placeholder="Profumi, gusto, sensazioni…" />
+    </Field>
+    <Field label="Abbinamenti" className="sm:col-span-2">
+      <textarea value={form.abbinamenti} onChange={(e) => set("abbinamenti", e.target.value)} rows={2} maxLength={1000} data-testid="wine-form-abbinamenti-input"
+        className="field h-auto py-2.5 leading-relaxed" placeholder="es. Brasati, selvaggina, formaggi stagionati" />
     </Field>
   </div>
 );

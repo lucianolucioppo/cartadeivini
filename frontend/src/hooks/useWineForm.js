@@ -6,7 +6,7 @@ import { useInvalidateWines } from "@/lib/queries";
 export const EMPTY_WINE = {
   nome: "", produttore: "", regione: "", denominazione: "", tipologia: "", affinamento: "", vitigno: "", annata: "",
   formato: "0,75 l", gradazione: "", temperatura_servizio: "", prezzo_acquisto: "", fornitore: "", prezzo_carta: "", foto_path: null,
-  note: "", preferito: false, visibile: true, esaurito: false,
+  note: "", abbinamenti: "", preferito: false, visibile: true, esaurito: false,
 };
 
 const toForm = (w) => ({ ...EMPTY_WINE, ...w, prezzo_acquisto: w.prezzo_acquisto ?? "", prezzo_carta: w.prezzo_carta ?? "" });
